@@ -205,6 +205,7 @@ def game_loop():
     x=(display_width*0.45)
     y=(display_height*0.8)
     x_change=0
+    y22 = 7
 
     bumped=False
     while not bumped:
@@ -225,6 +226,28 @@ def game_loop():
         x+=x_change
         pause=True
         gamedisplays.fill(gray)
+        car(x, y)
+        rel_y = y22 % backgroundpic.get_rect().width
+
+        gamedisplays.blit(backgroundpic, (0, rel_y - backgroundpic.get_rect().width))
+        gamedisplays.blit(backgroundpic, (700, rel_y - backgroundpic.get_rect().width))
+
+        if rel_y < 800:
+            gamedisplays.blit(backgroundpic, (0, rel_y))
+            gamedisplays.blit(backgroundpic, (700, rel_y))
+            gamedisplays.blit(yellow_strip, (400, rel_y))
+            gamedisplays.blit(yellow_strip, (400, rel_y + 100))
+            gamedisplays.blit(yellow_strip, (400, rel_y + 200))
+            gamedisplays.blit(yellow_strip, (400, rel_y + 300))
+            gamedisplays.blit(yellow_strip, (400, rel_y + 400))
+            gamedisplays.blit(yellow_strip, (400, rel_y + 500))
+            gamedisplays.blit(yellow_strip, (400, rel_y - 100))
+            gamedisplays.blit(strip, (120, rel_y - 200))
+            gamedisplays.blit(strip, (120, rel_y + 20))
+            gamedisplays.blit(strip, (120, rel_y + 30))
+            gamedisplays.blit(strip, (680, rel_y - 100))
+            gamedisplays.blit(strip, (680, rel_y + 20))
+            gamedisplays.blit(strip, (680, rel_y + 30))
 
         button("Pause",650,0,150,50,blue,bright_blue,"pause")
         pygame.display.update()
