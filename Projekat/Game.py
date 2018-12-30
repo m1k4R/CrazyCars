@@ -27,6 +27,7 @@ instruction_background=pygame.image.load("background2.jpg")
 car_width=56
 #pause=False
 
+
 def intro_loop():
     intro=True
     while intro:
@@ -102,6 +103,7 @@ def countdown_background():
     gamedisplays.blit(score,(0,30))
     button("PAUSE",650,0,150,50,blue,bright_blue,"pause")
 
+
 def countdown():
     countdown=True
 
@@ -145,6 +147,7 @@ def countdown():
             clock.tick(1)
             game_loop()
 
+
 def obstacle(obs_startx,obs_starty,obs):
     if obs==0:
         obs_pic=pygame.image.load("car.jpg")
@@ -167,6 +170,7 @@ def text_objects(text,font):
     textsurface=font.render(text,True,black)
     return textsurface,textsurface.get_rect()
 
+
 def message_display(text):
     largetext=pygame.font.Font("freesansbold.ttf",80)
     textsurf,textrect=text_objects(text,largetext)
@@ -175,6 +179,14 @@ def message_display(text):
     pygame.display.update()
     time.sleep(3)
     game_loop()
+
+
+def crash():
+    message_display("YOU CRASHED")
+
+
+def game_over():
+    message_display("GAME OVER")
 
 
 def background():
@@ -202,31 +214,70 @@ def car(x,y):
 
 def game_loop():
     global pause
-    x=(display_width*0.45)
-    y=(display_height*0.8)
-    x_change=0
+    p1_lives = 3
+    p2_lives = 3
+    x = (display_width * 0.3)
+    y = (display_height * 0.8)
+    x2 = (display_width * 0.7)
+    y2 = (display_height * 0.8)
+    x_change = 0
+    y_change = 0
+    x_change2 = 0
+    y_change2 = 0
+    obstacle_speed = 9
+    obs = 0
+    obs_startx = random.randrange(200, (display_width - 200))
+    obs_starty = -750
+    obs_width = 56
+    obs_height = 125
+    passed = 0
+    level = 0
+    score = 0
     y22 = 7
+    fps = 120
 
-    bumped=False
+    bumped = False
     while not bumped:
         for event in pygame.event.get():
-            if event.type==pygame.QUIT:
+            if event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
 
-            if event.type==pygame.KEYDOWN:
-                if event.key==pygame.K_LEFT:
-                    x_change=-5
-                if event.key==pygame.K_RIGHT:
-                    x_change=5
-            if event.type==pygame.KEYUP:
-                if event.key==pygame.K_LEFT or event.key==pygame.K_RIGHT:
-                    x_change=0
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_LEFT:
+                    x_change = -5
+                if event.key == pygame.K_RIGHT:
+                    x_change = 5
+                if event.key == pygame.K_DOWN:
+                    y_change = 5
+                if event.key == pygame.K_UP:
+                    y_change = -5
 
-        x+=x_change
-        pause=True
+                if event.key == pygame.K_a:
+                    x_change2 = -5
+                if event.key == pygame.K_d:
+                    x_change2 = 5
+                if event.key == pygame.K_s:
+                    y_change2 = 5
+                if event.key == pygame.K_w:
+                    y_change2 = -5
+            if event.type == pygame.KEYUP:
+                if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
+                    x_change = 0
+                if event.key == pygame.K_UP or event.key == pygame.K_DOWN:
+                    y_change = 0
+                if event.key == pygame.K_a or event.key == pygame.K_d:
+                    x_change2 = 0
+                if event.key == pygame.K_w or event.key == pygame.K_s:
+                    y_change2 = 0
+
+        x += x_change
+        y += y_change
+        x2 += x_change2
+        y2 += y_change2
+        pause = True
         gamedisplays.fill(gray)
-        car(x, y)
+
         rel_y = y22 % backgroundpic.get_rect().width
 
         gamedisplays.blit(backgroundpic, (0, rel_y - backgroundpic.get_rect().width))
@@ -248,6 +299,56 @@ def game_loop():
             gamedisplays.blit(strip, (680, rel_y - 100))
             gamedisplays.blit(strip, (680, rel_y + 20))
             gamedisplays.blit(strip, (680, rel_y + 30))
+
+        y22 += obstacle_speed
+
+        obs_starty -= (obstacle_speed / 4)
+        obstacle(obs_startx, obs_starty, obs)
+        obs_starty += obstacle_speed
+        car(x, y)
+        car(x2, y2)
+        score_system(passed, score)
+
+        '''if x>690-car_width or x<110:
+            crash()'''
+        if x > display_width - (car_width + 110) or x < 110:
+            crash()
+        if x2 > display_width - (car_width + 110) or x2 < 110:
+            crash()
+
+        if obs_starty > display_height:
+            obs_starty = 0 - obs_height
+            obs_startx = random.randrange(170, (display_width - 170))
+            obs = random.randrange(0, 7)
+            passed = passed + 1
+            score = passed * 10
+            if int(passed) % 10 == 0:
+                level = level + 1
+                obstacle_speed + 2
+                largetext = pygame.font.Font("freesansbold.ttf", 80)
+                textsurf, textrect = text_objects("LEVEL" + str(level), largetext)
+                textrect.center = ((display_width / 2), (display_height / 2))
+                gamedisplays.blit(textsurf, textrect)
+                pygame.display.update()
+                time.sleep(3)
+
+        if y < obs_starty + obs_height:
+            if x > obs_startx and x < obs_startx + obs_width or x + car_width > obs_startx and x + car_width < obs_startx + obs_width:
+                if p1_lives == 1:
+                    p1_lives = p1_lives - 1
+                    game_over()
+                else:
+                    p1_lives = p1_lives - 1
+                    crash()
+
+        if y2 < obs_starty + obs_height:
+            if x2 > obs_startx and x2 < obs_startx + obs_width or x2 + car_width > obs_startx and x2 + car_width < obs_startx + obs_width:
+                if p2_lives == 1:
+                    p2_lives = p2_lives - 1
+                    game_over()
+                else:
+                    p2_lives = p2_lives - 1
+                    crash()
 
         button("Pause",650,0,150,50,blue,bright_blue,"pause")
         pygame.display.update()
