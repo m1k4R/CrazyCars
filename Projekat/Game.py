@@ -3,6 +3,7 @@ import time
 import random
 
 from Car import Car
+from ObstacleOil import Oil
 
 pygame.init()
 gray = (119, 118, 110)
@@ -33,13 +34,6 @@ class Obstacle:
         self.obs_width = obs_width
         self.obs_height = obs_height
 
-class Oil:
-    def __init__(self, oil_startx, oil_starty, oil, oil_width, oil_height):
-        self.oil_startx = oil_startx
-        self.oil_starty = oil_starty
-        self.oil = oil
-        self.oil_width = oil_width
-        self.oil_height = oil_height
 
 def obstacle(obs_startx, obs_starty, obs):
     if obs == 0:
@@ -156,6 +150,7 @@ def game_loop():
     oil_speed = 2.5
     oils = []
     oil = 0
+    oil_width = 114
     oil_height = 107
     oil_startx = random.randrange(0, display_width)
     oil_starty = 0
@@ -163,6 +158,7 @@ def game_loop():
     bumped = False
     passed = 0
     level = 0
+    new_oil = Oil(oil_startx, oil_starty, oil, oil_width, oil_height)
     while not bumped:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -303,13 +299,9 @@ def game_loop():
 
         # Pomjeranje nafte
         for obst_oil in oils:
-            obst_oil.oil_starty += (oil_speed / 4)
-            oil_obstacle(obst_oil.oil_startx, obst_oil.oil_starty, obst_oil.oil)
-            obst_oil.oil_starty += oil_speed
+            obst_oil.move_oil_obstacle(oil_speed, gamedisplays)
 
-        oil_starty += (oil_speed / 4)
-        oil_obstacle(oil_startx, oil_starty, oil)
-        oil_starty += oil_speed
+        new_oil.move_oil_obstacle(oil_speed, gamedisplays)
 
         # Pomjeri autice i liste
         for obst_car in obstacles:
@@ -325,7 +317,7 @@ def game_loop():
         player2.show_car(gamedisplays)
 
         # Nafta
-        if oil_starty > oil_height:
+        if new_oil.oil_starty > new_oil.oil_height:
             for obst_oil in oils:
                 if obst_oil.oil_starty > display_height:
                     obst_oil.oil_starty = 0 - obst_oil.oil_height
@@ -333,24 +325,24 @@ def game_loop():
                     obst_oil.oil = random.randrange(0, 2)
                     if len(oils) < 10:
                         if oil == 0:
-                            obs_oil = Oil(oil_startx, oil_starty, oil, 114, 107)
+                            obs_oil = Oil(new_oil.oil_startx, new_oil.oil_starty, new_oil.oil, 114, 107)
                         else:
-                            obs_oil = Oil(oil_startx, oil_starty, oil, 78, 62)
+                            obs_oil = Oil(new_oil.oil_startx, new_oil.oil_starty, new_oil.oil, 78, 62)
                         oils.append(obs_oil)
-                    oil_starty = obst_oil.oil_starty
-                    oil_startx = obst_oil.oil_startx
-                    oil = obst_oil.oil
+                    new_oil.oil_starty = obst_oil.oil_starty
+                    new_oil.oil_startx = obst_oil.oil_startx
+                    new_oil.oil = obst_oil.oil
                     oil_exist = True
                     break
             if oil_exist == False:
                 if oil == 0:
-                    obs_oil = Oil(oil_startx, oil_starty, oil, 114, 107)
+                    obs_oil = Oil(new_oil.oil_startx, new_oil.oil_starty, new_oil.oil, 114, 107)
                 else:
-                    obs_oil = Oil(oil_startx, oil_starty, oil, 78, 62)
+                    obs_oil = Oil(new_oil.oil_startx, new_oil.oil_starty, new_oil.oil, 78, 62)
                 oils.append(obs_oil)
-                oil_starty = 0 - oil_height
-                oil_startx = random.randrange(0, display_width)
-                oil = random.randrange(0, 2)
+                new_oil.oil_starty = 0 - oil_height
+                new_oil.oil_startx = random.randrange(0, display_width)
+                new_oil.oil = random.randrange(0, 2)
 
         #Autici
         if obs_starty > obs_height:
