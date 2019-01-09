@@ -2,6 +2,8 @@ import pygame
 import time
 import random
 
+from Car import Car
+
 pygame.init()
 gray = (119, 118, 110)
 white = (255, 255, 255)
@@ -11,7 +13,11 @@ gamedisplays = pygame.display.set_mode((display_width, display_height))
 pygame.display.set_caption("crazy cars")
 clock = pygame.time.Clock()
 carimg_player1 = pygame.image.load('car1.png')
+carimg_player1_left = pygame.image.load('car1l.png')
+carimg_player1_right = pygame.image.load('car1r.png')
 carimg_player2 = pygame.image.load('car2.png')
+carimg_player2_left = pygame.image.load('car2l.png')
+carimg_player2_right = pygame.image.load('car2r.png')
 white_strip = pygame.image.load('line.png')
 car_width = 32
 car_height = 64
@@ -65,12 +71,8 @@ def message_life_player(text):
     largetext = pygame.font.Font("freesansbold.ttf", 20)
     textsurf1, textrect1 = text_objects("Player 2", largetext)
     textsurf2, textrect2 = text_objects("Player 1", largetext)
-    #textrect = ((display_width/2), (display_height/2))
     gamedisplays.blit(textsurf1, (20, 10))
     gamedisplays.blit(textsurf2, (700, 10))
-    #pygame.display.update()
-    #time.sleep(3)
-    #game_loop()
 
 def life_player1(number):
     if number == 3:
@@ -138,35 +140,13 @@ def background():
     gamedisplays.blit(white_strip, (720, 600))
     gamedisplays.blit(white_strip, (720, 750))
 
-def car_player1(x, y):
-    gamedisplays.blit(carimg_player1, (x, y))
-
-
-def car_player2(x, y):
-    gamedisplays.blit(carimg_player2, (x, y))
-
 
 def game_loop():
-    x = (display_width * 0.45)
-    y = (display_height * 0.8)
-    x_change = 0
-    y_change = 0
-    left = False
-    right = False
-    up = False
-    down = False
-    x2 = (display_width * 0.30)
-    y2 = (display_height * 0.8)
-    x2_change = 0
-    y2_change = 0
-    left2 = False
-    right2 = False
-    up2 = False
-    down2 = False
+    player1 = Car(display_width * 0.65, display_height * 0.8, carimg_player1, carimg_player1_left, carimg_player1_right)
+    player2 = Car(display_width * 0.30, display_height * 0.8, carimg_player2, carimg_player2_left, carimg_player2_right)
     obstacle_speed = 3
     obstacles = []
     obs = 0
-    obsy_change = 0
     obs_width = 32
     obs_height = 64
     obs_startx = random.randrange(0, display_width - obs_width)
@@ -176,86 +156,83 @@ def game_loop():
     oil_speed = 2.5
     oils = []
     oil = 0
-    # oil_width = 114
     oil_height = 107
     oil_startx = random.randrange(0, display_width)
     oil_starty = 0
     oil_exist = False
-    player1_life = 3
-    player2_life = 3
-    global carimg_player1
-    global carimg_player2
     bumped = False
     passed = 0
     level = 0
     while not bumped:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
+                #pygame.quit()
+                #quit()
                 bumped = True
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_LEFT:
-                x_change = -5
-                left = True
-                carimg_player1 = pygame.image.load('car1l.png')
+                player1.x_change = -5
+                player1.left = True
+                player1.car_img = player1.images[1]
             if event.key == pygame.K_RIGHT:
-                x_change = 5
-                right = True
-                carimg_player1 = pygame.image.load('car1r.png')
+                player1.x_change = 5
+                player1.right = True
+                player1.car_img = player1.images[2]
             if event.key == pygame.K_UP:
-                y_change = -5
-                up = True
+                player1.y_change = -5
+                player1.up = True
             if event.key == pygame.K_DOWN:
-                y_change = 5
-                down = True
+                player1.y_change = 5
+                player1.down = True
             if event.key == pygame.K_a:
-                x2_change = -5
-                left2 = True
-                carimg_player2 = pygame.image.load('car2l.png')
+                player2.x_change = -5
+                player2.left = True
+                player2.car_img = player2.images[1]
             if event.key == pygame.K_d:
-                x2_change = 5
-                right2 = True
-                carimg_player2 = pygame.image.load('car2r.png')
+                player2.x_change = 5
+                player2.right = True
+                player2.car_img = player2.images[2]
             if event.key == pygame.K_w:
-                y2_change = -5
-                up2 = True
+                player2.y_change = -5
+                player2.up = True
             if event.key == pygame.K_s:
-                y2_change = 5
-                down2 = True
+                player2.y_change = 5
+                player2.down = True
         if event.type == pygame.KEYUP:
             if event.key == pygame.K_LEFT:
-                left = False
-                carimg_player1 = pygame.image.load('car1.png')
+                player1.left = False
+                player1.car_img = player1.images[0]
             if event.key == pygame.K_RIGHT:
-                right = False
-                carimg_player1 = pygame.image.load('car1.png')
+                player1.right = False
+                player1.car_img = player1.images[0]
             if event.key == pygame.K_UP:
-                up = False
+                player1.up = False
             if event.key == pygame.K_DOWN:
-                down = False
+                player1.down = False
             if event.key == pygame.K_a:
-                left2 = False
-                carimg_player2 = pygame.image.load('car2.png')
+                player2.left = False
+                player2.car_img = player2.images[0]
             if event.key == pygame.K_d:
-                right2 = False
-                carimg_player2 = pygame.image.load('car2.png')
+                player2.right = False
+                player2.car_img = player2.images[0]
             if event.key == pygame.K_w:
-                up2 = False
+                player2.up = False
             if event.key == pygame.K_s:
-                down2 = False
+                player2.down = False
 
-            if left == False and right == False:
-                x_change = 0
-            if up == False and down == False:
-                y_change = 0
-            if left2 == False and right2 == False:
-                x2_change = 0
-            if up2 == False and down2 == False:
-                y2_change = 0
+            if player1.left == False and player1.right == False:
+                player1.x_change = 0
+            if player1.up == False and player1.down == False:
+                player1.y_change = 0
+            if player2.left == False and player2.right == False:
+                player2.x_change = 0
+            if player2.up == False and player2.down == False:
+                player2.y_change = 0
 
-        x += x_change
-        y += y_change
-        x2 += x2_change
-        y2 += y2_change
+        player1.x += player1.x_change
+        player1.y += player1.y_change
+        player2.x += player2.x_change
+        player2.y += player2.y_change
         gamedisplays.fill(gray)
 
         rel_y = pom % 300
@@ -313,34 +290,18 @@ def game_loop():
         #background()
         message_life_player("3")
         #message_life_player2()
-        if x <= 1 or x >= display_width - car_width:
-            x -= x_change
-        if y <= 60 or y >= display_height - car_height:
-            y -= y_change
-        if x2 <= 1 or x2 >= display_width - car_width:
-            x2 -= x2_change
-        if y2 <= 60 or y2 >= display_height - car_height:
-            y2 -= y2_change
 
-        if y >= y2 and y <= y2 + car_height or y + car_height >= y2 and y + car_height <= y2 + car_height:
-            if x >= x2 and x <= x2 + car_width or x + car_width >= x2 and x + car_width <= x2 + car_width:
-                x -= x_change
-                y -= y_change
-        if y2 >= y and y2 <= y + car_height or y2 + car_height >= y and y2 + car_height <= y + car_height:
-            if x2 >= x and x2 <= x + car_width or x2 + car_width >= x and x2 + car_width <= x + car_width:
-                x2 -= x2_change
-                y2 -= y2_change
+        player1.check_border(display_width, display_height)
+        player2.check_border(display_width, display_height)
+
+        player1.check_another_player_colision(player2)
+        player2.check_another_player_colision(player1)
+
         for obst_oil in oils:
-            if y > obst_oil.oil_starty and y < obst_oil.oil_starty + obst_oil.oil_height or y + car_height > obst_oil.oil_starty and y + car_height < obst_oil.oil_starty + obst_oil.oil_height:
-                if x > obst_oil.oil_startx and x < obst_oil.oil_startx + obst_oil.oil_width or x + car_width > obst_oil.oil_startx and x + car_width < obst_oil.oil_startx + obst_oil.oil_width:
-                    x -= x_change
-                    y -= y_change
-            if y2 > obst_oil.oil_starty and y2 < obst_oil.oil_starty + obst_oil.oil_height or y2 + car_height > obst_oil.oil_starty and y2 + car_height < obst_oil.oil_starty + obst_oil.oil_height:
-                if x2 > obst_oil.oil_startx and x2 < obst_oil.oil_startx + obst_oil.oil_width or x2 + car_width > obst_oil.oil_startx and x2 + car_width < obst_oil.oil_startx + obst_oil.oil_width:
-                    x2 -= x2_change
-                    y2 -= y2_change
+            player1.check_oil_colision(obst_oil)
+            player2.check_oil_colision(obst_oil)
 
-            # Pomjeranje nafte
+        # Pomjeranje nafte
         for obst_oil in oils:
             obst_oil.oil_starty += (oil_speed / 4)
             oil_obstacle(obst_oil.oil_startx, obst_oil.oil_starty, obst_oil.oil)
@@ -359,6 +320,9 @@ def game_loop():
         obs_starty += (obstacle_speed / 4)
         obstacle(obs_startx, obs_starty, obs)
         obs_starty += obstacle_speed
+
+        player1.show_car(gamedisplays)
+        player2.show_car(gamedisplays)
 
         # Nafta
         if oil_starty > oil_height:
@@ -387,9 +351,8 @@ def game_loop():
                 oil_starty = 0 - oil_height
                 oil_startx = random.randrange(0, display_width)
                 oil = random.randrange(0, 2)
-        car_player1(x, y)
-        car_player2(x2, y2)
 
+        #Autici
         if obs_starty > obs_height:
             for obst_car in obstacles:
                 if obst_car.obs_starty > display_height:
@@ -425,25 +388,8 @@ def game_loop():
                 obs_height = obs_car.obs_height
 
         for obst_car in obstacles:
-            if y > obst_car.obs_starty and y < obst_car.obs_starty + obst_car.obs_height or y + car_height > obst_car.obs_starty and y + car_height < obst_car.obs_starty + obst_car.obs_height:
-                if x > obst_car.obs_startx and x < obst_car.obs_startx + obst_car.obs_width or x + car_width > obst_car.obs_startx and x + car_width < obst_car.obs_startx + obst_car.obs_width:
-                    if player1_life <= 1.5:
-                        x = -500
-                        y = -500
-                        # crash()
-                    else:
-                        player1_life -= 0.1
-                        gamedisplays.blit(bom, (x - 10, y - 10))
-
-            if y2 > obst_car.obs_starty and y2 < obst_car.obs_starty + obst_car.obs_height or y2 + car_height > obst_car.obs_starty and y2 + car_height < obst_car.obs_starty + obst_car.obs_height:
-                if x2 > obst_car.obs_startx and x2 < obst_car.obs_startx + obst_car.obs_width or x2 + car_width > obst_car.obs_startx and x2 + car_width < obst_car.obs_startx + obst_car.obs_width:
-                    if player2_life <= 1.0:
-                        x2 = -500
-                        y2 = -500
-                        # crash()
-                    else:
-                        player2_life -= 0.1
-                        gamedisplays.blit(bom, (x2 - 10, y2 - 10))
+            player1.check_obstacle_colision(obst_car, gamedisplays, bom)
+            player2.check_obstacle_colision(obst_car, gamedisplays, bom)
 
         pygame.display.update()
         clock.tick(60)
