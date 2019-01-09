@@ -15,7 +15,17 @@ carimg_player2 = pygame.image.load('car2.png')
 white_strip = pygame.image.load('line.png')
 car_width = 32
 car_height = 64
+boom = pygame.image.load('boom.png')
+bom = pygame.image.load('bom.png')
 
+
+class Obstacle:
+    def __init__(self, obs_startx, obs_starty, obs, obs_width, obs_height):
+        self.obs_startx = obs_startx
+        self.obs_starty = obs_starty
+        self.obs = obs
+        self.obs_width = obs_width
+        self.obs_height = obs_height
 
 class Oil:
     def __init__(self, oil_startx, oil_starty, oil, oil_width, oil_height):
@@ -154,6 +164,14 @@ def game_loop():
     up2 = False
     down2 = False
     obstacle_speed = 3
+    obstacles = []
+    obs = 0
+    obsy_change = 0
+    obs_width = 32
+    obs_height = 64
+    obs_startx = random.randrange(0, display_width - obs_width)
+    obs_starty = 0
+    obs_exist = False
     pom = 7
     oil_speed = 2.5
     oils = []
@@ -168,6 +186,8 @@ def game_loop():
     global carimg_player1
     global carimg_player2
     bumped = False
+    passed = 0
+    level = 0
     while not bumped:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -330,6 +350,16 @@ def game_loop():
         oil_obstacle(oil_startx, oil_starty, oil)
         oil_starty += oil_speed
 
+        # Pomjeri autice i liste
+        for obst_car in obstacles:
+            obst_car.obs_starty += (obstacle_speed / 4)
+            obstacle(obst_car.obs_startx, obst_car.obs_starty, obst_car.obs)
+            obst_car.obs_starty += obstacle_speed
+        # Pomjeri trenutni autic koji je tek izasao i nije u listi
+        obs_starty += (obstacle_speed / 4)
+        obstacle(obs_startx, obs_starty, obs)
+        obs_starty += obstacle_speed
+
         # Nafta
         if oil_starty > oil_height:
             for obst_oil in oils:
@@ -359,6 +389,62 @@ def game_loop():
                 oil = random.randrange(0, 2)
         car_player1(x, y)
         car_player2(x2, y2)
+
+        if obs_starty > obs_height:
+            for obst_car in obstacles:
+                if obst_car.obs_starty > display_height:
+                    obst_car.obs_starty = 0 - obst_car.obs_height
+                    obst_car.obs_startx = random.randrange(0, display_width - obst_car.obs_width)
+                    obst_car.obs = random.randrange(0, 5)
+                    if len(obstacles) < 10:
+                        if obs == 4:
+                            obs_car = Obstacle(obs_startx, obs_starty, obs, 36, 102)
+                        else:
+                            obs_car = Obstacle(obs_startx, obs_starty, obs, 32, 64)
+                        obstacles.append(obs_car)
+                    obs_starty = obst_car.obs_starty
+                    obs_startx = obst_car.obs_startx
+                    obs = obst_car.obs
+                    obs_height = obst_car.obs_height
+                    obs_exist = True
+                    passed = passed + 1
+                    if int(passed) % 20 == 0:
+                        level = level + 1
+                        obstacle_speed += 1
+                        oil_speed += 1
+                    break
+            if obs_exist == False:
+                if obs == 4:
+                    obs_car = Obstacle(obs_startx, obs_starty, obs, 36, 102)
+                else:
+                    obs_car = Obstacle(obs_startx, obs_starty, obs, 32, 64)
+                obstacles.append(obs_car)
+                obs_starty = 0 - obs_car.obs_height
+                obs_startx = random.randrange(0, display_width - obs_car.obs_width)
+                obs = random.randrange(0, 5)
+                obs_height = obs_car.obs_height
+
+        for obst_car in obstacles:
+            if y > obst_car.obs_starty and y < obst_car.obs_starty + obst_car.obs_height or y + car_height > obst_car.obs_starty and y + car_height < obst_car.obs_starty + obst_car.obs_height:
+                if x > obst_car.obs_startx and x < obst_car.obs_startx + obst_car.obs_width or x + car_width > obst_car.obs_startx and x + car_width < obst_car.obs_startx + obst_car.obs_width:
+                    if player1_life <= 1.5:
+                        x = -500
+                        y = -500
+                        # crash()
+                    else:
+                        player1_life -= 0.1
+                        gamedisplays.blit(bom, (x - 10, y - 10))
+
+            if y2 > obst_car.obs_starty and y2 < obst_car.obs_starty + obst_car.obs_height or y2 + car_height > obst_car.obs_starty and y2 + car_height < obst_car.obs_starty + obst_car.obs_height:
+                if x2 > obst_car.obs_startx and x2 < obst_car.obs_startx + obst_car.obs_width or x2 + car_width > obst_car.obs_startx and x2 + car_width < obst_car.obs_startx + obst_car.obs_width:
+                    if player2_life <= 1.0:
+                        x2 = -500
+                        y2 = -500
+                        # crash()
+                    else:
+                        player2_life -= 0.1
+                        gamedisplays.blit(bom, (x2 - 10, y2 - 10))
+
         pygame.display.update()
         clock.tick(60)
 
