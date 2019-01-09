@@ -16,6 +16,15 @@ white_strip = pygame.image.load('line.png')
 car_width = 32
 car_height = 64
 
+
+class Oil:
+    def __init__(self, oil_startx, oil_starty, oil, oil_width, oil_height):
+        self.oil_startx = oil_startx
+        self.oil_starty = oil_starty
+        self.oil = oil
+        self.oil_width = oil_width
+        self.oil_height = oil_height
+
 def obstacle(obs_startx, obs_starty, obs):
     if obs == 0:
         obs_pic = pygame.image.load("car3.png")
@@ -146,6 +155,14 @@ def game_loop():
     down2 = False
     obstacle_speed = 3
     pom = 7
+    oil_speed = 2.5
+    oils = []
+    oil = 0
+    # oil_width = 114
+    oil_height = 107
+    oil_startx = random.randrange(0, display_width)
+    oil_starty = 0
+    oil_exist = False
     player1_life = 3
     player2_life = 3
     global carimg_player1
@@ -293,7 +310,53 @@ def game_loop():
             if x2 >= x and x2 <= x + car_width or x2 + car_width >= x and x2 + car_width <= x + car_width:
                 x2 -= x2_change
                 y2 -= y2_change
+        for obst_oil in oils:
+            if y > obst_oil.oil_starty and y < obst_oil.oil_starty + obst_oil.oil_height or y + car_height > obst_oil.oil_starty and y + car_height < obst_oil.oil_starty + obst_oil.oil_height:
+                if x > obst_oil.oil_startx and x < obst_oil.oil_startx + obst_oil.oil_width or x + car_width > obst_oil.oil_startx and x + car_width < obst_oil.oil_startx + obst_oil.oil_width:
+                    x -= x_change
+                    y -= y_change
+            if y2 > obst_oil.oil_starty and y2 < obst_oil.oil_starty + obst_oil.oil_height or y2 + car_height > obst_oil.oil_starty and y2 + car_height < obst_oil.oil_starty + obst_oil.oil_height:
+                if x2 > obst_oil.oil_startx and x2 < obst_oil.oil_startx + obst_oil.oil_width or x2 + car_width > obst_oil.oil_startx and x2 + car_width < obst_oil.oil_startx + obst_oil.oil_width:
+                    x2 -= x2_change
+                    y2 -= y2_change
 
+            # Pomjeranje nafte
+        for obst_oil in oils:
+            obst_oil.oil_starty += (oil_speed / 4)
+            oil_obstacle(obst_oil.oil_startx, obst_oil.oil_starty, obst_oil.oil)
+            obst_oil.oil_starty += oil_speed
+
+        oil_starty += (oil_speed / 4)
+        oil_obstacle(oil_startx, oil_starty, oil)
+        oil_starty += oil_speed
+
+        # Nafta
+        if oil_starty > oil_height:
+            for obst_oil in oils:
+                if obst_oil.oil_starty > display_height:
+                    obst_oil.oil_starty = 0 - obst_oil.oil_height
+                    obst_oil.oil_startx = random.randrange(0, display_width)
+                    obst_oil.oil = random.randrange(0, 2)
+                    if len(oils) < 10:
+                        if oil == 0:
+                            obs_oil = Oil(oil_startx, oil_starty, oil, 114, 107)
+                        else:
+                            obs_oil = Oil(oil_startx, oil_starty, oil, 78, 62)
+                        oils.append(obs_oil)
+                    oil_starty = obst_oil.oil_starty
+                    oil_startx = obst_oil.oil_startx
+                    oil = obst_oil.oil
+                    oil_exist = True
+                    break
+            if oil_exist == False:
+                if oil == 0:
+                    obs_oil = Oil(oil_startx, oil_starty, oil, 114, 107)
+                else:
+                    obs_oil = Oil(oil_startx, oil_starty, oil, 78, 62)
+                oils.append(obs_oil)
+                oil_starty = 0 - oil_height
+                oil_startx = random.randrange(0, display_width)
+                oil = random.randrange(0, 2)
         car_player1(x, y)
         car_player2(x2, y2)
         pygame.display.update()
