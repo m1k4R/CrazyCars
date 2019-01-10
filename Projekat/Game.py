@@ -25,7 +25,7 @@ car_width = 32
 car_height = 64
 boom = pygame.image.load('boom.png')
 bom = pygame.image.load('bom.png')
-
+level_img = pygame.image.load('linelevel.png')
 
 def oil_obstacle(oil_startx, oil_starty, oil):
     if oil == 0:
@@ -34,6 +34,16 @@ def oil_obstacle(oil_startx, oil_starty, oil):
         oil_pic = pygame.image.load("oill.png")
     gamedisplays.blit(oil_pic, (oil_startx, oil_starty))
 
+def score_level_system(passed, level):
+    font = pygame.font.SysFont(None, 25)
+    text = font.render("Passed: " + str(passed), True, white)
+    font_level = pygame.font.SysFont(None, 35)
+    text_level = font_level.render("LEVEL", True, white)
+    txt_level = font_level.render(str(level), True, white)
+    gamedisplays.blit(text, (5, 680))
+    gamedisplays.blit(text_level, (350, 7))
+    gamedisplays.blit(level_img, (340, 35))
+    gamedisplays.blit(txt_level, (380, 44))
 
 def text_objects(text, font):
     textsurface = font.render(text, True, white)
@@ -47,6 +57,14 @@ def message_life_player(text):
     gamedisplays.blit(textsurf1, (20, 10))
     gamedisplays.blit(textsurf2, (700, 10))
 
+def message_display(text):
+    largetext3 = pygame.font.Font("freesansbold.ttf", 80)
+    textsurf3, textrect3 = text_objects(text, largetext3)
+    textrect3.center = ((display_width / 2), (display_height / 2))
+    gamedisplays.blit(textsurf3, textrect3)
+    pygame.display.update()
+    time.sleep(3)
+    game_loop()
 
 def life_player1(number):
     if number == 3:
@@ -87,6 +105,8 @@ def background(rel_y):
         gamedisplays.blit(white_strip, (a, rel_y - 150))
 
 
+def crash():
+    message_display("GAME OVER")
 def game_loop():
     player1 = Car(display_width * 0.65, display_height * 0.8, carimg_player1, carimg_player1_left, carimg_player1_right)
     player2 = Car(display_width * 0.30, display_height * 0.8, carimg_player2, carimg_player2_left, carimg_player2_right)
@@ -178,6 +198,24 @@ def game_loop():
             if player2.up == False and player2.down == False:
                 player2.y_change = 0
 
+            if player1.up == False and player1.down == True:
+                player1.y_change = 5
+            if player1.up == True and player1.down == False:
+                player1.y_change = -5
+            if player2.up == False and player2.down == True:
+                player2.y_change = 5
+            if player2.up == True and player2.down == False:
+                player2.y_change = -5
+
+            if player1.left == False and player1.right == True:
+                player1.x_change = 5
+            if player1.left == True and player1.right == False:
+                player1.x_change = -5
+            if player2.left == False and player2.right == True:
+                player2.x_change = 5
+            if player2.left == True and player2.right == False:
+                player2.x_change = -5
+
         player1.x += player1.x_change
         player1.y += player1.y_change
         player2.x += player2.x_change
@@ -216,6 +254,20 @@ def game_loop():
 
         player1.show_car(gamedisplays)
         player2.show_car(gamedisplays)
+
+        if player1.life > 1.5:
+            player1.show_car(gamedisplays)
+        if player2.life > 1.5:
+            player2.show_car(gamedisplays)
+
+        message_life_player("3")
+        # message_life_player2()
+        life_player1(player1.life)
+        life_player2(player2.life)
+        score_level_system(passed, level)
+
+        if player1.life <= 1.5 and player2.life <= 1.5:
+            crash()
 
         # Nafta
         if new_oil.oil_starty > new_oil.oil_height:
