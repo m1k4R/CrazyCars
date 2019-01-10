@@ -4,6 +4,7 @@ import random
 
 from Car import Car
 from ObstacleOil import Oil
+from ObstacleCar import ObstacleCar
 
 pygame.init()
 gray = (119, 118, 110)
@@ -26,29 +27,6 @@ boom = pygame.image.load('boom.png')
 bom = pygame.image.load('bom.png')
 
 
-class Obstacle:
-    def __init__(self, obs_startx, obs_starty, obs, obs_width, obs_height):
-        self.obs_startx = obs_startx
-        self.obs_starty = obs_starty
-        self.obs = obs
-        self.obs_width = obs_width
-        self.obs_height = obs_height
-
-
-def obstacle(obs_startx, obs_starty, obs):
-    if obs == 0:
-        obs_pic = pygame.image.load("car3.png")
-    elif obs == 1:
-        obs_pic = pygame.image.load("car4.png")
-    elif obs == 2:
-        obs_pic = pygame.image.load("car5.png")
-    elif obs == 3:
-        obs_pic = pygame.image.load("car6.png")
-    elif obs == 4:
-        obs_pic = pygame.image.load("car7.png")
-    gamedisplays.blit(obs_pic, (obs_startx, obs_starty))
-
-
 def oil_obstacle(oil_startx, oil_starty, oil):
     if oil == 0:
         oil_pic = pygame.image.load("oil.png")
@@ -61,12 +39,14 @@ def text_objects(text, font):
     textsurface = font.render(text, True, white)
     return  textsurface, textsurface.get_rect()
 
+
 def message_life_player(text):
     largetext = pygame.font.Font("freesansbold.ttf", 20)
     textsurf1, textrect1 = text_objects("Player 2", largetext)
     textsurf2, textrect2 = text_objects("Player 1", largetext)
     gamedisplays.blit(textsurf1, (20, 10))
     gamedisplays.blit(textsurf2, (700, 10))
+
 
 def life_player1(number):
     if number == 3:
@@ -96,43 +76,15 @@ def life_player2(number):
     gamedisplays.blit(life_pic, (15, 40))
 
 
-def background():
-    gamedisplays.blit(white_strip, (120, 0))
-    gamedisplays.blit(white_strip, (120, 150))
-    gamedisplays.blit(white_strip, (120, 300))
-    gamedisplays.blit(white_strip, (120, 450))
-    gamedisplays.blit(white_strip, (120, 600))
-    gamedisplays.blit(white_strip, (120, 750))
-    gamedisplays.blit(white_strip, (240, 0))
-    gamedisplays.blit(white_strip, (240, 150))
-    gamedisplays.blit(white_strip, (240, 300))
-    gamedisplays.blit(white_strip, (240, 450))
-    gamedisplays.blit(white_strip, (240, 600))
-    gamedisplays.blit(white_strip, (240, 750))
-    gamedisplays.blit(white_strip, (360, 0))
-    gamedisplays.blit(white_strip, (360, 150))
-    gamedisplays.blit(white_strip, (360, 300))
-    gamedisplays.blit(white_strip, (360, 450))
-    gamedisplays.blit(white_strip, (360, 600))
-    gamedisplays.blit(white_strip, (360, 750))
-    gamedisplays.blit(white_strip, (480, 0))
-    gamedisplays.blit(white_strip, (480, 150))
-    gamedisplays.blit(white_strip, (480, 300))
-    gamedisplays.blit(white_strip, (480, 450))
-    gamedisplays.blit(white_strip, (480, 600))
-    gamedisplays.blit(white_strip, (480, 750))
-    gamedisplays.blit(white_strip, (600, 0))
-    gamedisplays.blit(white_strip, (600, 150))
-    gamedisplays.blit(white_strip, (600, 300))
-    gamedisplays.blit(white_strip, (600, 450))
-    gamedisplays.blit(white_strip, (600, 600))
-    gamedisplays.blit(white_strip, (600, 750))
-    gamedisplays.blit(white_strip, (720, 0))
-    gamedisplays.blit(white_strip, (720, 150))
-    gamedisplays.blit(white_strip, (720, 300))
-    gamedisplays.blit(white_strip, (720, 450))
-    gamedisplays.blit(white_strip, (720, 600))
-    gamedisplays.blit(white_strip, (720, 750))
+def background(rel_y):
+    white_strip = pygame.image.load('line.png')
+    x = [120, 240, 360, 480, 600, 720]
+    y = [0, 150, 300, 450, 600, 750]
+    for a in x:
+        for b in y:
+            gamedisplays.blit(white_strip, (a, rel_y + b))
+        gamedisplays.blit(white_strip, (a, rel_y - 300))
+        gamedisplays.blit(white_strip, (a, rel_y - 150))
 
 
 def game_loop():
@@ -158,6 +110,7 @@ def game_loop():
     bumped = False
     passed = 0
     level = 0
+    new_car = ObstacleCar(obs_startx, 0, 0, 32, 64)
     new_oil = Oil(oil_startx, oil_starty, oil, oil_width, oil_height)
     while not bumped:
         for event in pygame.event.get():
@@ -233,54 +186,7 @@ def game_loop():
 
         rel_y = pom % 300
         if rel_y < 800:
-            gamedisplays.blit(white_strip, (120, rel_y + 0))
-            gamedisplays.blit(white_strip, (120, rel_y + 150))
-            gamedisplays.blit(white_strip, (120, rel_y + 300))
-            gamedisplays.blit(white_strip, (120, rel_y + 450))
-            gamedisplays.blit(white_strip, (120, rel_y + 600))
-            gamedisplays.blit(white_strip, (120, rel_y + 750))
-            gamedisplays.blit(white_strip, (120, rel_y - 300))
-            gamedisplays.blit(white_strip, (120, rel_y - 150))
-            gamedisplays.blit(white_strip, (240, rel_y + 0))
-            gamedisplays.blit(white_strip, (240, rel_y + 150))
-            gamedisplays.blit(white_strip, (240, rel_y + 300))
-            gamedisplays.blit(white_strip, (240, rel_y + 450))
-            gamedisplays.blit(white_strip, (240, rel_y + 600))
-            gamedisplays.blit(white_strip, (240, rel_y + 750))
-            gamedisplays.blit(white_strip, (240, rel_y - 300))
-            gamedisplays.blit(white_strip, (240, rel_y - 150))
-            gamedisplays.blit(white_strip, (360, rel_y + 0))
-            gamedisplays.blit(white_strip, (360, rel_y + 150))
-            gamedisplays.blit(white_strip, (360, rel_y + 300))
-            gamedisplays.blit(white_strip, (360, rel_y + 450))
-            gamedisplays.blit(white_strip, (360, rel_y + 600))
-            gamedisplays.blit(white_strip, (360, rel_y + 750))
-            gamedisplays.blit(white_strip, (360, rel_y - 300))
-            gamedisplays.blit(white_strip, (360, rel_y - 150))
-            gamedisplays.blit(white_strip, (480, rel_y + 0))
-            gamedisplays.blit(white_strip, (480, rel_y + 150))
-            gamedisplays.blit(white_strip, (480, rel_y + 300))
-            gamedisplays.blit(white_strip, (480, rel_y + 450))
-            gamedisplays.blit(white_strip, (480, rel_y + 600))
-            gamedisplays.blit(white_strip, (480, rel_y + 750))
-            gamedisplays.blit(white_strip, (480, rel_y - 300))
-            gamedisplays.blit(white_strip, (480, rel_y - 150))
-            gamedisplays.blit(white_strip, (600, rel_y + 0))
-            gamedisplays.blit(white_strip, (600, rel_y + 150))
-            gamedisplays.blit(white_strip, (600, rel_y + 300))
-            gamedisplays.blit(white_strip, (600, rel_y + 450))
-            gamedisplays.blit(white_strip, (600, rel_y + 600))
-            gamedisplays.blit(white_strip, (600, rel_y + 750))
-            gamedisplays.blit(white_strip, (600, rel_y - 300))
-            gamedisplays.blit(white_strip, (600, rel_y - 150))
-            gamedisplays.blit(white_strip, (720, rel_y + 0))
-            gamedisplays.blit(white_strip, (720, rel_y + 150))
-            gamedisplays.blit(white_strip, (720, rel_y + 300))
-            gamedisplays.blit(white_strip, (720, rel_y + 450))
-            gamedisplays.blit(white_strip, (720, rel_y + 600))
-            gamedisplays.blit(white_strip, (720, rel_y + 750))
-            gamedisplays.blit(white_strip, (720, rel_y - 300))
-            gamedisplays.blit(white_strip, (720, rel_y - 150))
+            background(rel_y)
 
         pom += obstacle_speed
         #background()
@@ -303,15 +209,10 @@ def game_loop():
 
         new_oil.move_oil_obstacle(oil_speed, gamedisplays)
 
-        # Pomjeri autice i liste
+        # Pomjeranje autica
         for obst_car in obstacles:
-            obst_car.obs_starty += (obstacle_speed / 4)
-            obstacle(obst_car.obs_startx, obst_car.obs_starty, obst_car.obs)
-            obst_car.obs_starty += obstacle_speed
-        # Pomjeri trenutni autic koji je tek izasao i nije u listi
-        obs_starty += (obstacle_speed / 4)
-        obstacle(obs_startx, obs_starty, obs)
-        obs_starty += obstacle_speed
+            obst_car.move_obstacle(obstacle_speed, gamedisplays)
+        new_car.move_obstacle(obstacle_speed, gamedisplays)
 
         player1.show_car(gamedisplays)
         player2.show_car(gamedisplays)
@@ -344,40 +245,40 @@ def game_loop():
                 new_oil.oil_startx = random.randrange(0, display_width)
                 new_oil.oil = random.randrange(0, 2)
 
-        #Autici
-        if obs_starty > obs_height:
-            for obst_car in obstacles:
-                if obst_car.obs_starty > display_height:
-                    obst_car.obs_starty = 0 - obst_car.obs_height
-                    obst_car.obs_startx = random.randrange(0, display_width - obst_car.obs_width)
-                    obst_car.obs = random.randrange(0, 5)
-                    if len(obstacles) < 10:
-                        if obs == 4:
-                            obs_car = Obstacle(obs_startx, obs_starty, obs, 36, 102)
-                        else:
-                            obs_car = Obstacle(obs_startx, obs_starty, obs, 32, 64)
-                        obstacles.append(obs_car)
-                    obs_starty = obst_car.obs_starty
-                    obs_startx = obst_car.obs_startx
-                    obs = obst_car.obs
-                    obs_height = obst_car.obs_height
-                    obs_exist = True
-                    passed = passed + 1
-                    if int(passed) % 20 == 0:
-                        level = level + 1
-                        obstacle_speed += 1
-                        oil_speed += 1
-                    break
-            if obs_exist == False:
-                if obs == 4:
-                    obs_car = Obstacle(obs_startx, obs_starty, obs, 36, 102)
-                else:
-                    obs_car = Obstacle(obs_startx, obs_starty, obs, 32, 64)
-                obstacles.append(obs_car)
-                obs_starty = 0 - obs_car.obs_height
-                obs_startx = random.randrange(0, display_width - obs_car.obs_width)
-                obs = random.randrange(0, 5)
-                obs_height = obs_car.obs_height
+                # Autici
+            if new_car.obs_starty > new_car.obs_height:
+                for obst_car in obstacles:
+                    if obst_car.obs_starty > display_height:
+                        obst_car.obs_starty = 0 - obst_car.obs_height
+                        obst_car.obs_startx = random.randrange(0, display_width - obst_car.obs_width)
+                        obst_car.obs = random.randrange(0, 5)
+                        if len(obstacles) < 10:
+                            if new_car.obs == 4:
+                                obs_car = ObstacleCar(new_car.obs_startx, new_car.obs_starty, new_car.obs, 36, 102)
+                            else:
+                                obs_car = ObstacleCar(new_car.obs_startx, new_car.obs_starty, new_car.obs, 32, 64)
+                            obstacles.append(obs_car)
+                        new_car.obs_starty = obst_car.obs_starty
+                        new_car.obs_startx = obst_car.obs_startx
+                        new_car.obs = obst_car.obs
+                        new_car.obs_height = obst_car.obs_height
+                        obs_exist = True
+                        passed = passed + 1
+                        if int(passed) % 20 == 0:
+                            level = level + 1
+                            obstacle_speed += 1
+                            oil_speed += 1
+                        break
+                if obs_exist == False:
+                    if new_car.obs == 4:
+                        obs_car = ObstacleCar(new_car.obs_startx, new_car.obs_starty, new_car.obs, 36, 102)
+                    else:
+                        obs_car = ObstacleCar(new_car.obs_startx, new_car.obs_starty, new_car.obs, 32, 64)
+                    obstacles.append(obs_car)
+                    new_car.obs_starty = 0 - obs_car.obs_height
+                    new_car.obs_startx = random.randrange(0, display_width - obs_car.obs_width)
+                    new_car.obs = random.randrange(0, 5)
+                    new_car.obs_height = obs_car.obs_height
 
         for obst_car in obstacles:
             player1.check_obstacle_colision(obst_car, gamedisplays, bom)
