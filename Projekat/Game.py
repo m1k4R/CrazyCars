@@ -5,6 +5,7 @@ import random
 from Car import Car
 from ObstacleOil import Oil
 from ObstacleCar import ObstacleCar
+import keyboard
 
 pygame.init()
 gray = (119, 118, 110)
@@ -26,6 +27,104 @@ car_height = 64
 boom = pygame.image.load('boom.png')
 bom = pygame.image.load('bom.png')
 level_img = pygame.image.load('linelevel.png')
+udlf = pygame.image.load('udlr.png')
+wasd = pygame.image.load('wasd.png')
+bright_blue = (0, 0, 255)
+bright_green = (0, 255, 0)
+bright_red = (255, 0, 0)
+green = (0, 200, 0)
+red = (255, 0, 0)
+blue = (0, 0, 200)
+gray2 = (186, 186, 186,0)
+gray3 = (114, 114, 114)
+yellow = (255,207,49)
+image1 = pygame.image.load('image1.jpg')
+
+def intro_loop():
+    intro=True
+    while intro:
+        for event in pygame.event.get():
+            if event.type==pygame.QUIT:
+                pygame.quit()
+                quit()
+                sys.exit()
+
+        gamedisplays.fill(gray)
+        largetext=pygame.font.Font('freesansbold.ttf',95)
+        TextSurf,TextRect=text_objects("CRAZY CARS",largetext)
+        TextRect.center=(400,100)
+        gamedisplays.fill(gray3)
+        imag = pygame.transform.scale(image1, (800,600))
+        gamedisplays.blit(imag, (0, 100))
+        gamedisplays.blit(TextSurf,TextRect)
+        if keyboard.is_pressed('SPACE'):
+            game_loop()
+        button("START",390,234,70,40,red,yellow,"play")
+        button("QUIT",430,630,200,50,gray2,gray3,"quit")
+        button("INSTRUCTION",210,630,200,50,gray2,gray3,"intro")
+        pygame.display.update()
+        clock.tick(50)
+
+def button(msg,x,y,w,h,ic,ac,action=None):
+    mouse=pygame.mouse.get_pos()
+    click=pygame.mouse.get_pressed()
+
+    if x+w>mouse[0]>x and y+h>mouse[1]>y:
+        pygame.draw.rect(gamedisplays,ac,(x,y,w,h))
+
+        if click[0]==1 and action!=None:
+            if action=="play":
+                game_loop()
+            elif action=="quit":
+                pygame.quit()
+                quit()
+                sys.exit()
+            elif action=="intro":
+                introduction()
+            elif action=="menu":
+                intro_loop()
+    else:
+        pygame.draw.rect(gamedisplays,ic,(x,y,w,h))
+
+    smalltext=pygame.font.Font("freesansbold.ttf",20)
+    textsurf,textrect=text_objects(msg,smalltext)
+    textrect.center=((x+(w/2)),(y+(h/2)))
+    gamedisplays.blit(textsurf,textrect)
+
+def introduction():
+    introduction=True
+
+    while introduction:
+        for event in pygame.event.get():
+            if event.type==pygame.QUIT:
+                pygame.quit()
+                quit()
+                sys.exit()
+
+        gamedisplays.fill(gray)
+        largetext=pygame.font.Font('freesansbold.ttf',80)
+        smalltext=pygame.font.Font('freesansbold.ttf',20)
+        mediumtext=pygame.font.Font('freesansbold.ttf',40)
+        TextSurf,TextRect=text_objects("INSTRUCTION",largetext)
+        TextRect.center=((400),(100))
+        gamedisplays.blit(TextSurf,TextRect)
+        stextSurf,stextRect=text_objects("PLAYER 1",smalltext)
+        stextRect.center=((210),(300))
+        stextSurf2, stextRect2 = text_objects("PLAYER 2", smalltext)
+        stextRect2.center = ((555), (300))
+        sTextSurf,sTextRect=text_objects("CONTROLS",mediumtext)
+        sTextRect.center=((400),(200))
+        gamedisplays.blit(sTextSurf,sTextRect)
+
+        gamedisplays.blit(stextSurf,stextRect)
+        gamedisplays.blit(stextSurf2,stextRect2)
+        control1 = pygame.transform.scale(udlf, (300,192))
+        gamedisplays.blit(control1,(50,350))
+        gamedisplays.blit(wasd,(420,350))
+        button("BACK",320,600,100,50,gray2,gray,"menu")
+        pygame.display.update()
+        clock.tick(30)
+
 
 def oil_obstacle(oil_startx, oil_starty, oil):
     if oil == 0:
@@ -135,86 +234,86 @@ def game_loop():
     while not bumped:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                #pygame.quit()
-                #quit()
-                bumped = True
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_LEFT:
-                player1.x_change = -5
-                player1.left = True
-                player1.car_img = player1.images[1]
-            if event.key == pygame.K_RIGHT:
-                player1.x_change = 5
-                player1.right = True
-                player1.car_img = player1.images[2]
-            if event.key == pygame.K_UP:
-                player1.y_change = -5
-                player1.up = True
-            if event.key == pygame.K_DOWN:
-                player1.y_change = 5
-                player1.down = True
-            if event.key == pygame.K_a:
-                player2.x_change = -5
-                player2.left = True
-                player2.car_img = player2.images[1]
-            if event.key == pygame.K_d:
-                player2.x_change = 5
-                player2.right = True
-                player2.car_img = player2.images[2]
-            if event.key == pygame.K_w:
-                player2.y_change = -5
-                player2.up = True
-            if event.key == pygame.K_s:
-                player2.y_change = 5
-                player2.down = True
-        if event.type == pygame.KEYUP:
-            if event.key == pygame.K_LEFT:
-                player1.left = False
-                player1.car_img = player1.images[0]
-            if event.key == pygame.K_RIGHT:
-                player1.right = False
-                player1.car_img = player1.images[0]
-            if event.key == pygame.K_UP:
-                player1.up = False
-            if event.key == pygame.K_DOWN:
-                player1.down = False
-            if event.key == pygame.K_a:
-                player2.left = False
-                player2.car_img = player2.images[0]
-            if event.key == pygame.K_d:
-                player2.right = False
-                player2.car_img = player2.images[0]
-            if event.key == pygame.K_w:
-                player2.up = False
-            if event.key == pygame.K_s:
-                player2.down = False
+                pygame.quit()
+                quit()
+                #bumped = True
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_LEFT:
+                    player1.x_change = -5
+                    player1.left = True
+                    player1.car_img = player1.images[1]
+                if event.key == pygame.K_RIGHT:
+                    player1.x_change = 5
+                    player1.right = True
+                    player1.car_img = player1.images[2]
+                if event.key == pygame.K_UP:
+                    player1.y_change = -5
+                    player1.up = True
+                if event.key == pygame.K_DOWN:
+                    player1.y_change = 5
+                    player1.down = True
+                if event.key == pygame.K_a:
+                    player2.x_change = -5
+                    player2.left = True
+                    player2.car_img = player2.images[1]
+                if event.key == pygame.K_d:
+                    player2.x_change = 5
+                    player2.right = True
+                    player2.car_img = player2.images[2]
+                if event.key == pygame.K_w:
+                    player2.y_change = -5
+                    player2.up = True
+                if event.key == pygame.K_s:
+                    player2.y_change = 5
+                    player2.down = True
+            if event.type == pygame.KEYUP:
+                if event.key == pygame.K_LEFT:
+                    player1.left = False
+                    player1.car_img = player1.images[0]
+                if event.key == pygame.K_RIGHT:
+                    player1.right = False
+                    player1.car_img = player1.images[0]
+                if event.key == pygame.K_UP:
+                    player1.up = False
+                if event.key == pygame.K_DOWN:
+                    player1.down = False
+                if event.key == pygame.K_a:
+                    player2.left = False
+                    player2.car_img = player2.images[0]
+                if event.key == pygame.K_d:
+                    player2.right = False
+                    player2.car_img = player2.images[0]
+                if event.key == pygame.K_w:
+                    player2.up = False
+                if event.key == pygame.K_s:
+                    player2.down = False
 
-            if player1.left == False and player1.right == False:
-                player1.x_change = 0
-            if player1.up == False and player1.down == False:
-                player1.y_change = 0
-            if player2.left == False and player2.right == False:
-                player2.x_change = 0
-            if player2.up == False and player2.down == False:
-                player2.y_change = 0
+                if player1.left == False and player1.right == False:
+                    player1.x_change = 0
+                if player1.up == False and player1.down == False:
+                    player1.y_change = 0
+                if player2.left == False and player2.right == False:
+                    player2.x_change = 0
+                if player2.up == False and player2.down == False:
+                    player2.y_change = 0
 
-            if player1.up == False and player1.down == True:
-                player1.y_change = 5
-            if player1.up == True and player1.down == False:
-                player1.y_change = -5
-            if player2.up == False and player2.down == True:
-                player2.y_change = 5
-            if player2.up == True and player2.down == False:
-                player2.y_change = -5
+                if player1.up == False and player1.down == True:
+                    player1.y_change = 5
+                if player1.up == True and player1.down == False:
+                    player1.y_change = -5
+                if player2.up == False and player2.down == True:
+                    player2.y_change = 5
+                if player2.up == True and player2.down == False:
+                    player2.y_change = -5
 
-            if player1.left == False and player1.right == True:
-                player1.x_change = 5
-            if player1.left == True and player1.right == False:
-                player1.x_change = -5
-            if player2.left == False and player2.right == True:
-                player2.x_change = 5
-            if player2.left == True and player2.right == False:
-                player2.x_change = -5
+                if player1.left == False and player1.right == True:
+                    player1.x_change = 5
+                if player1.left == True and player1.right == False:
+                    player1.x_change = -5
+                if player2.left == False and player2.right == True:
+                    player2.x_change = 5
+                if player2.left == True and player2.right == False:
+                    player2.x_change = -5
 
         player1.x += player1.x_change
         player1.y += player1.y_change
@@ -339,7 +438,7 @@ def game_loop():
         pygame.display.update()
         clock.tick(60)
 
-
-game_loop()
+intro_loop()
+#game_loop()
 pygame.quit()
 quit()
