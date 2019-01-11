@@ -2,29 +2,11 @@ import sys
 import keyboard
 import pygame
 from Game import Game
+from Constants import *
 
 pygame.init()
-display_width = 800
-display_height = 700
-gamedisplays = pygame.display.set_mode((display_width, display_height))
-clock = pygame.time.Clock()
-udlf = pygame.image.load('udlr.png')
-wasd = pygame.image.load('wasd.png')
-white = (255, 255, 255)
-gray = (119, 118, 110)
-bright_blue = (0, 0, 255)
-bright_green = (0, 255, 0)
-bright_red = (255, 0, 0)
-green = (0, 200, 0)
-red = (255, 0, 0)
-blue = (0, 0, 200)
-gray2 = (186, 186, 186,0)
-gray3 = (114, 114, 114)
-yellow = (255, 207, 49)
-image1 = pygame.image.load('image1.jpg')
 
-
-class IntroWindow:
+class CrazyCars:
     def __init__(self, game):
         self.game = game
 
@@ -121,7 +103,7 @@ class IntroWindow:
 if __name__ == '__main__':
 
     game = Game(800, 700)
-    new_game = IntroWindow(game)
+    new_game = CrazyCars(game)
 
     new_game.intro_loop()
     pygame.quit()
