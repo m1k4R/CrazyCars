@@ -327,68 +327,7 @@ class Game:
             if player1.life <= 1.5 and player2.life <= 1.5:
                 self.crash()
 
-            # Nafta
-            if new_oil.oil_starty > new_oil.oil_height:
-                for obst_oil in self.oils:
-                    if obst_oil.oil_starty > display_height:
-                        obst_oil.oil_starty = 0 - obst_oil.oil_height
-                        obst_oil.oil_startx = random.randrange(0, display_width)
-                        obst_oil.oil = random.randrange(0, 2)
-                        if len(self.oils) < 10:
-                            if new_oil.oil == 0:
-                                obs_oil = Oil(new_oil.oil_startx, new_oil.oil_starty, new_oil.oil, 114, 107)
-                            else:
-                                obs_oil = Oil(new_oil.oil_startx, new_oil.oil_starty, new_oil.oil, 78, 62)
-                            self.oils.append(obs_oil)
-                        new_oil.oil_starty = obst_oil.oil_starty
-                        new_oil.oil_startx = obst_oil.oil_startx
-                        new_oil.oil = obst_oil.oil
-                        self.oil_exist = True
-                        break
-                if self.oil_exist == False:
-                    if new_oil.oil == 0:
-                        obs_oil = Oil(new_oil.oil_startx, new_oil.oil_starty, new_oil.oil, 114, 107)
-                    else:
-                        obs_oil = Oil(new_oil.oil_startx, new_oil.oil_starty, new_oil.oil, 78, 62)
-                    self.oils.append(obs_oil)
-                    new_oil.oil_starty = 0 - new_oil.oil_height
-                    new_oil.oil_startx = random.randrange(0, display_width)
-                    new_oil.oil = random.randrange(0, 2)
-
-                    # Autici
-                if new_car.obs_starty > new_car.obs_height:
-                    for obst_car in self.obstacles:
-                        if obst_car.obs_starty > display_height:
-                            obst_car.obs_starty = 0 - obst_car.obs_height
-                            obst_car.obs_startx = random.randrange(0, display_width - obst_car.obs_width)
-                            obst_car.obs = random.randrange(0, 5)
-                            if len(self.obstacles) < 10:
-                                if new_car.obs == 4:
-                                    obs_car = ObstacleCar(new_car.obs_startx, new_car.obs_starty, new_car.obs, 36, 102)
-                                else:
-                                    obs_car = ObstacleCar(new_car.obs_startx, new_car.obs_starty, new_car.obs, 32, 64)
-                                self.obstacles.append(obs_car)
-                            new_car.obs_starty = obst_car.obs_starty
-                            new_car.obs_startx = obst_car.obs_startx
-                            new_car.obs = obst_car.obs
-                            new_car.obs_height = obst_car.obs_height
-                            self.obs_exist = True
-                            self.passed = self.passed + 1
-                            if int(self.passed) % 20 == 0:
-                                self.level = self.level + 1
-                                self.obstacle_speed += 1
-                                self.oil_speed += 1
-                            break
-                    if self.obs_exist == False:
-                        if new_car.obs == 4:
-                            obs_car = ObstacleCar(new_car.obs_startx, new_car.obs_starty, new_car.obs, 36, 102)
-                        else:
-                            obs_car = ObstacleCar(new_car.obs_startx, new_car.obs_starty, new_car.obs, 32, 64)
-                        self.obstacles.append(obs_car)
-                        new_car.obs_starty = 0 - obs_car.obs_height
-                        new_car.obs_startx = random.randrange(0, display_width - obs_car.obs_width)
-                        new_car.obs = random.randrange(0, 5)
-                        new_car.obs_height = obs_car.obs_height
+            self.t_create_obstacles(new_oil, self.oils, new_car, self.obstacles, self.passed, self.level,self.obstacle_speed, self.oil_speed, self.obs_exist, self.oil_exist)
 
             pygame.display.update()
             clock.tick(60)
@@ -396,6 +335,12 @@ class Game:
     def t_start_game(self, player1, player2, oils, obstacles):
         t = threading.Thread(target=self.start_player, args=(player1, player2, oils, obstacles))
         t1 = threading.Thread(target=self.start_player, args=(player2, player1, oils, obstacles))
+        t.start()
+        t1.start()
+
+    def t_create_obstacles(self, new_oil, oils, new_car, obstacles, passed, level, obstacle_speed, oil_speed, obs_exist,oil_exist):
+        t = threading.Thread(target=self.create_oil_obstacles, args=(new_oil, oils, oil_exist))
+        t1 = threading.Thread(target=self.create_car_obstacles,args=(new_car, obstacles, passed, level, obstacle_speed, oil_speed, obs_exist))
         t.start()
         t1.start()
 
@@ -409,11 +354,75 @@ class Game:
         for obst_car in obstacles:
             player.check_obstacle_colision(obst_car, gamedisplays, bom)
 
+    def create_oil_obstacles(self, new_oil, oils, oil_exist):
+        if new_oil.oil_starty > new_oil.oil_height:
+            for obst_oil in oils:
+                if obst_oil.oil_starty > display_height:
+                    obst_oil.oil_starty = 0 - obst_oil.oil_height
+                    obst_oil.oil_startx = random.randrange(0, display_width)
+                    obst_oil.oil = random.randrange(0, 2)
+                    if len(self.oils) < 10:
+                        if new_oil.oil == 0:
+                            obs_oil = Oil(new_oil.oil_startx, new_oil.oil_starty, new_oil.oil, 114, 107)
+                        else:
+                            obs_oil = Oil(new_oil.oil_startx, new_oil.oil_starty, new_oil.oil, 78, 62)
+                        self.oils.append(obs_oil)
+                    new_oil.oil_starty = obst_oil.oil_starty
+                    new_oil.oil_startx = obst_oil.oil_startx
+                    new_oil.oil = obst_oil.oil
+                    self.oil_exist = True
+                    break
+            if self.oil_exist == False:
+                if new_oil.oil == 0:
+                    obs_oil = Oil(new_oil.oil_startx, new_oil.oil_starty, new_oil.oil, 114, 107)
+                else:
+                    obs_oil = Oil(new_oil.oil_startx, new_oil.oil_starty, new_oil.oil, 78, 62)
+                self.oils.append(obs_oil)
+                new_oil.oil_starty = 0 - new_oil.oil_height
+                new_oil.oil_startx = random.randrange(0, display_width)
+                new_oil.oil = random.randrange(0, 2)
+
+    def create_car_obstacles(self, new_car, obstacles, passed, level, obstacle_speed, oil_speed, obs_exist):
+        if new_car.obs_starty > new_car.obs_height:
+            for obst_car in obstacles:
+                if obst_car.obs_starty > display_height:
+                    obst_car.obs_starty = 0 - obst_car.obs_height
+                    obst_car.obs_startx = random.randrange(0, display_width - obst_car.obs_width)
+                    obst_car.obs = random.randrange(0, 5)
+                    if len(self.obstacles) < 10:
+                        if new_car.obs == 4:
+                            obs_car = ObstacleCar(new_car.obs_startx, new_car.obs_starty, new_car.obs, 36, 102)
+                        else:
+                            obs_car = ObstacleCar(new_car.obs_startx, new_car.obs_starty, new_car.obs, 32, 64)
+                        self.obstacles.append(obs_car)
+                    new_car.obs_starty = obst_car.obs_starty
+                    new_car.obs_startx = obst_car.obs_startx
+                    new_car.obs = obst_car.obs
+                    new_car.obs_height = obst_car.obs_height
+                    self.obs_exist = True
+                    self.passed = self.passed + 1
+                    if int(self.passed) % 20 == 0:
+                        self.level = self.level + 1
+                        self.obstacle_speed += 1
+                        self.oil_speed += 1
+                    break
+            if self.obs_exist == False:
+                if new_car.obs == 4:
+                    obs_car = ObstacleCar(new_car.obs_startx, new_car.obs_starty, new_car.obs, 36, 102)
+                else:
+                    obs_car = ObstacleCar(new_car.obs_startx, new_car.obs_starty, new_car.obs, 32, 64)
+                self.obstacles.append(obs_car)
+                new_car.obs_starty = 0 - obs_car.obs_height
+                new_car.obs_startx = random.randrange(0, display_width - obs_car.obs_width)
+                new_car.obs = random.randrange(0, 5)
+                new_car.obs_height = obs_car.obs_height
+
     def draw_display(self, player1, player2):
         self.message_life_player()
         self.life_player1(player1.life)
         self.life_player2(player2.life)
         self.score_level_system(self.passed, self.level)
+
 
 if __name__ == '__main__':
     game = Game(800, 700)
