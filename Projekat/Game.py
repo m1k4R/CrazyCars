@@ -43,6 +43,7 @@ gray3 = (114, 114, 114)
 yellow = (255,207,49)
 image1 = pygame.image.load('image1.jpg')
 
+
 class Game:
     def __init__(self, display_width, display_height):
         self.display_width = display_width
@@ -60,92 +61,6 @@ class Game:
         self.obs_exist = False
         self.oil_exist = False
 
-    def intro_loop(self):
-        intro=True
-        while intro:
-            for event in pygame.event.get():
-                if event.type==pygame.QUIT:
-                    pygame.quit()
-                    quit()
-                    #sys.exit()
-
-            gamedisplays.fill(gray)
-            largetext=pygame.font.Font('freesansbold.ttf',95)
-            TextSurf,TextRect=self.text_objects("CRAZY CARS",largetext)
-            TextRect.center=(400,100)
-            gamedisplays.fill(gray3)
-            imag = pygame.transform.scale(image1, (800,600))
-            gamedisplays.blit(imag, (0, 100))
-            gamedisplays.blit(TextSurf,TextRect)
-            if keyboard.is_pressed('SPACE'):
-                self.game_loop()
-            self.button("START",390,234,70,40,red,yellow,"play")
-            self.button("QUIT",430,630,200,50,gray2,gray3,"quit")
-            self.button("INSTRUCTION",210,630,200,50,gray2,gray3,"intro")
-            pygame.display.update()
-            clock.tick(50)
-
-    def button(self, msg, x, y, w, h, ic, ac, action=None):
-        mouse=pygame.mouse.get_pos()
-        click=pygame.mouse.get_pressed()
-
-        if x+w>mouse[0]>x and y+h>mouse[1]>y:
-            pygame.draw.rect(gamedisplays,ac,(x,y,w,h))
-
-            if click[0]==1 and action!=None:
-                if action=="play":
-                    self.game_loop()
-                elif action=="quit":
-                    pygame.quit()
-                    quit()
-                    #sys.exit()
-                elif action=="intro":
-                    self.introduction()
-                elif action=="menu":
-                    self.intro_loop()
-        else:
-            pygame.draw.rect(gamedisplays,ic,(x,y,w,h))
-
-        smalltext=pygame.font.Font("freesansbold.ttf",20)
-        textsurf,textrect=self.text_objects(msg,smalltext)
-        textrect.center=((x+(w/2)),(y+(h/2)))
-        gamedisplays.blit(textsurf,textrect)
-
-    def introduction(self):
-        introduction=True
-
-        while introduction:
-            for event in pygame.event.get():
-                if event.type==pygame.QUIT:
-                    pygame.quit()
-                    quit()
-                    #sys.exit()
-
-            gamedisplays.fill(gray)
-            largetext=pygame.font.Font('freesansbold.ttf',80)
-            smalltext=pygame.font.Font('freesansbold.ttf',20)
-            mediumtext=pygame.font.Font('freesansbold.ttf',40)
-            TextSurf,TextRect=self.text_objects("INSTRUCTION",largetext)
-            TextRect.center=((400),(100))
-            gamedisplays.blit(TextSurf,TextRect)
-            stextSurf,stextRect=self.text_objects("PLAYER 1",smalltext)
-            stextRect.center=((210),(300))
-            stextSurf2, stextRect2 = self.text_objects("PLAYER 2", smalltext)
-            stextRect2.center = ((555), (300))
-            sTextSurf,sTextRect=self.text_objects("CONTROLS",mediumtext)
-            sTextRect.center=((400),(200))
-            gamedisplays.blit(sTextSurf,sTextRect)
-
-            gamedisplays.blit(stextSurf,stextRect)
-            gamedisplays.blit(stextSurf2,stextRect2)
-            control1 = pygame.transform.scale(udlf, (300,192))
-            gamedisplays.blit(control1,(50,350))
-            gamedisplays.blit(wasd,(420,350))
-            self.button("BACK",320,600,100,50,gray2,gray,"menu")
-            pygame.display.update()
-            clock.tick(30)
-
-
     def score_level_system(self, passed, level):
         font = pygame.font.SysFont(None, 25)
         text = font.render("Passed: " + str(passed), True, white)
@@ -161,7 +76,6 @@ class Game:
         textsurface = font.render(text, True, white)
         return  textsurface, textsurface.get_rect()
 
-
     def message_life_player(self):
         largetext = pygame.font.Font("freesansbold.ttf", 20)
         textsurf1, textrect1 = self.text_objects("Player 2", largetext)
@@ -176,7 +90,6 @@ class Game:
         gamedisplays.blit(textsurf3, textrect3)
         pygame.display.update()
         time.sleep(3)
-        self.game_loop()
 
     def life_player1(self, number):
         if number == 3:
@@ -191,7 +104,6 @@ class Game:
             life_pic = pygame.image.load("r3.png")
         gamedisplays.blit(life_pic, (695, 40))
 
-
     def life_player2(self, number):
         if number == 3:
             life_pic = pygame.image.load("y3.png")
@@ -205,7 +117,6 @@ class Game:
             life_pic = pygame.image.load("y3.png")
         gamedisplays.blit(life_pic, (15, 40))
 
-
     def background(self, rel_y):
         white_strip = pygame.image.load('line.png')
         x = [120, 240, 360, 480, 600, 720]
@@ -216,10 +127,9 @@ class Game:
             gamedisplays.blit(white_strip, (a, rel_y - 300))
             gamedisplays.blit(white_strip, (a, rel_y - 150))
 
-
     def crash(self):
         self.message_display("GAME OVER")
-
+        return True
 
     def game_loop(self):
         player1 = Car(display_width * 0.65, display_height * 0.8, carimg_player1, carimg_player1_left, carimg_player1_right)
@@ -325,7 +235,7 @@ class Game:
             self.draw_display(player1, player2)
 
             if player1.life <= 1.5 and player2.life <= 1.5:
-                self.crash()
+                bumped = self.crash()
 
             self.t_create_obstacles(new_oil, self.oils, new_car, self.obstacles, self.passed, self.level,self.obstacle_speed, self.oil_speed, self.obs_exist, self.oil_exist)
 
@@ -422,14 +332,3 @@ class Game:
         self.life_player1(player1.life)
         self.life_player2(player2.life)
         self.score_level_system(self.passed, self.level)
-
-
-if __name__ == '__main__':
-    game = Game(800, 700)
-    game.intro_loop()
-    #game_loop()
-    #p = mp.Process(target=game.intro_loop)
-    #p.start()
-    #p.join()
-    pygame.quit()
-    quit()
