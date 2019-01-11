@@ -22,6 +22,20 @@ class Car:
     def show_car(self, gamedisplays):
         gamedisplays.blit(self.car_img, (self.x, self.y))
 
+    def move_control(self):
+        if self.left == False and self.right == False:
+            self.x_change = 0
+        if self.up == False and self.down == False:
+            self.y_change = 0
+        if self.up == False and self.down == True:
+            self.y_change = 5
+        if self.up == True and self.down == False:
+            self.y_change = -5
+        if self.left == False and self.right == True:
+            self.x_change = 5
+        if self.left == True and self.right == False:
+            self.x_change = -5
+
     def check_border(self, display_width, display_height):
         if self.x <= 1 or self.x >= display_width - self.width:
             self.x -= self.x_change
