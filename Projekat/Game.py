@@ -3,16 +3,17 @@ import time
 import random
 import keyboard
 import threading
-import multiprocessing as mp
 
 from Car import Car
 from ObstacleOil import Oil
 from ObstacleCar import ObstacleCar
+from Bonus import Bonus
 from Constants import *
 from multiprocessing import Process
 import multiprocessing
 
 pygame.init()
+
 
 class Game:
     def __init__(self, display_width, display_height):
@@ -21,6 +22,7 @@ class Game:
         self.obstacle_speed = 3
         self.obstacles = []
         self.oil_speed = 2.5
+        self.bonus_speed = 2.5
         self.oils = []
         self.bumped = False
         self.passed = 0
@@ -114,22 +116,25 @@ class Game:
         return True
 
     def game_loop(self):
-        player1 = Car(display_width * 0.65, display_height * 0.8, carimg_player1, carimg_player1_left, carimg_player1_right)
-        player2 = Car(display_width * 0.30, display_height * 0.8, carimg_player2, carimg_player2_left, carimg_player2_right)
+        player1 = Car(display_width * 0.65, display_height * 0.8, carimg_player1, carimg_player1_left, carimg_player1_right, carspeed_player1, carspeed_player1_left, carspeed_player1_right, "Player1")
+        player2 = Car(display_width * 0.30, display_height * 0.8, carimg_player2, carimg_player2_left, carimg_player2_right, carspeed_player2, carspeed_player2_left, carspeed_player2_right, "Player2")
         self.oils[:] = []
         self.obstacles[:] = []
         self.level = 0
         self.passed = 0
         self.obstacle_speed = 3
         self.oil_speed = 2.5
+        self.bonus_speed = 2.5
         self.oil_exist = False
         self.obs_exist = False
         obs_width = 32
         pom = 7
         obs_startx = random.randrange(0, display_width - obs_width)
         oil_startx = random.randrange(0, display_width)
+        bonus_startx = random.randrange(31, display_width - 31)
         new_car = ObstacleCar(obs_startx, 0, 0, 32, 64)
         new_oil = Oil(oil_startx, 0, 0, 114, 107)
+        bonus = Bonus(bonus_img, 30, 31, bonus_startx, 0)
         t = threading.Thread(target=self.update_background)
         t.start()
         bumped = False
@@ -172,20 +177,32 @@ class Game:
                 if event.type == pygame.KEYUP:
                     if event.key == pygame.K_LEFT:
                         player1.left = False
-                        player1.car_img = player1.images[0]
+                        if player1.bonus is True:
+                            player1.car_img = player1.images[3]
+                        else:
+                            player1.car_img = player1.images[0]
                     if event.key == pygame.K_RIGHT:
                         player1.right = False
-                        player1.car_img = player1.images[0]
+                        if player1.bonus is True:
+                            player1.car_img = player1.images[3]
+                        else:
+                            player1.car_img = player1.images[0]
                     if event.key == pygame.K_UP:
                         player1.up = False
                     if event.key == pygame.K_DOWN:
                         player1.down = False
                     if event.key == pygame.K_a:
                         player2.left = False
-                        player2.car_img = player2.images[0]
+                        if player2.bonus is True:
+                            player2.car_img = player2.images[3]
+                        else:
+                            player2.car_img = player2.images[0]
                     if event.key == pygame.K_d:
                         player2.right = False
-                        player2.car_img = player2.images[0]
+                        if player2.bonus is True:
+                            player2.car_img = player2.images[3]
+                        else:
+                            player2.car_img = player2.images[0]
                     if event.key == pygame.K_w:
                         player2.up = False
                     if event.key == pygame.K_s:
@@ -193,6 +210,11 @@ class Game:
 
                     player1.move_control()
                     player2.move_control()
+
+            player1.check_bonus(bonus)
+            player2.check_bonus(bonus)
+            player1.start_bonus()
+            player2.start_bonus()
 
             player1.x += player1.x_change
             player1.y += player1.y_change
@@ -209,6 +231,12 @@ class Game:
             for obst_oil in self.oils:
                 obst_oil.move_oil_obstacle(self.oil_speed, gamedisplays)
             new_oil.move_oil_obstacle(self.oil_speed, gamedisplays)
+
+            # pomjeranje bonusa
+            if bonus.bonus_starty > display_height:
+                bonus.bonus_startx = random.randrange(31, display_width - 31)
+                bonus.bonus_starty = 0 - 30
+            bonus.move_bonus(self.bonus_speed, gamedisplays)
 
             # Pomjeranje autica
             for obst_car in self.obstacles:
@@ -300,6 +328,7 @@ class Game:
                         self.level = self.level + 1
                         self.obstacle_speed += 1
                         self.oil_speed += 1
+                        self.bonus_speed += 1
                     break
             if self.obs_exist == False:
                 if new_car.obs == 4:
@@ -317,6 +346,7 @@ class Game:
         self.life_player1(player1.life)
         self.life_player2(player2.life)
         self.score_level_system(self.passed, self.level)
+
 
 def GetLinesCoordinates(queue):
     x = 120

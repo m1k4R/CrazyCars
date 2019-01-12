@@ -4,7 +4,7 @@ import random
 
 
 class Car:
-    def __init__(self, x, y, car_img, car_img_left, car_img_right):
+    def __init__(self, x, y, car_img, car_img_left, car_img_right, carspeed_player, carspeed_player_left,carspeed_player_right, name):
         self.x = x
         self.y = y
         self.car_img = car_img
@@ -15,9 +15,13 @@ class Car:
         self.up = False
         self.down = False
         self.life = 3
-        self.images = [car_img, car_img_left, car_img_right]
+        self.images = [car_img, car_img_left, car_img_right, carspeed_player, carspeed_player_left,carspeed_player_right]
         self.width = 32
         self.height = 64
+        self.oil_hit = False
+        self.name = name
+        self.bonus = False
+        self.speed_count = 0
 
     def show_car(self, gamedisplays):
         gamedisplays.blit(self.car_img, (self.x, self.y))
@@ -35,6 +39,33 @@ class Car:
             self.x_change = 5
         if self.left == True and self.right == False:
             self.x_change = -5
+
+    def check_bonus(self, bonus):
+        if self.y > bonus.bonus_starty and self.y < bonus.bonus_starty + bonus.height or self.y + self.height > bonus.bonus_starty and self.y + self.height < bonus.bonus_starty + bonus.height:
+            if self.x > bonus.bonus_startx and self.x < bonus.bonus_startx + bonus.width or self.x + self.width > bonus.bonus_startx and self.x + self.width < bonus.bonus_startx + bonus.width:
+                self.bonus = True
+                bonus.bonus_starty = 0 - 300
+
+    def start_bonus(self):
+        if self.speed_count == 100:
+            self.bonus = False
+            self.car_img = self.images[0]
+            self.speed_count = 0
+
+        if self.bonus is True:
+            self.speed_count = self.speed_count + 1
+            if self.left == True:
+                self.x_change -= 0.5
+                self.car_img = self.images[4]
+            if self.right == True:
+                self.x_change += 0.5
+                self.car_img = self.images[5]
+            if self.up == True:
+                self.y_change -= 0.5
+                self.car_img = self.images[3]
+            if self.down == True:
+                self.y_change += 0.5
+                self.car_img = self.images[3]
 
     def check_border(self, display_width, display_height):
         if self.x <= 1 or self.x >= display_width - self.width:
