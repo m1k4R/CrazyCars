@@ -9,6 +9,8 @@ from Car import Car
 from ObstacleOil import Oil
 from ObstacleCar import ObstacleCar
 from Constants import *
+from multiprocessing import Process
+import multiprocessing
 
 pygame.init()
 
@@ -28,6 +30,10 @@ class Game:
         self.obs_width = 32
         self.obs_exist = False
         self.oil_exist = False
+        self.lines = []
+        self.queue = multiprocessing.Queue()
+        self.p = Process(target=GetLinesCoordinates, args=(self.queue,))
+        self.p.start()
 
     def score_level_system(self, passed, level):
         font = pygame.font.SysFont(None, 25)
@@ -87,13 +93,21 @@ class Game:
 
     def background(self, rel_y):
         white_strip = pygame.image.load('line.png')
-        x = [120, 240, 360, 480, 600, 720]
-        y = [0, 150, 300, 450, 600, 750]
-        for a in x:
-            for b in y:
-                gamedisplays.blit(white_strip, (a, rel_y + b))
-            gamedisplays.blit(white_strip, (a, rel_y - 300))
-            gamedisplays.blit(white_strip, (a, rel_y - 150))
+        counter1 = 0
+        counter2 = 1
+        if len((self.lines)) > 48:
+            self.p.terminate()
+            for x in range(48):
+                gamedisplays.blit(white_strip, (self.lines[counter1], rel_y + self.lines[counter2]))
+                counter1 += 2
+                counter2 += 2
+
+    def update_background(self):
+        while not self.queue.empty():
+            a = self.queue.get()
+            self.lines.append(a)
+            b = self.queue.get()
+            self.lines.append(b)
 
     def crash(self):
         self.message_display("GAME OVER")
@@ -116,7 +130,10 @@ class Game:
         oil_startx = random.randrange(0, display_width)
         new_car = ObstacleCar(obs_startx, 0, 0, 32, 64)
         new_oil = Oil(oil_startx, 0, 0, 114, 107)
+        t = threading.Thread(target=self.update_background)
+        t.start()
         bumped = False
+        time.sleep(1)
         while not bumped:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -300,3 +317,23 @@ class Game:
         self.life_player1(player1.life)
         self.life_player2(player2.life)
         self.score_level_system(self.passed, self.level)
+
+def GetLinesCoordinates(queue):
+    x = 120
+    y = 0
+    count = 0
+    while 1:
+        count += 1
+        queue.put(x)
+        queue.put(y)
+
+        if count == 6:
+            y -= 1050
+        elif count == 7:
+            y += 150
+        elif count == 8:
+            x += 120
+            y = 0
+            count = 0
+        else:
+            y += 150
