@@ -52,15 +52,15 @@ class Game:
         textsurface = font.render(text, True, white)
         return  textsurface, textsurface.get_rect()
 
-    def message_life_player(self):
+    def message_life_player(self, player1, player2):
         largetext = pygame.font.Font("freesansbold.ttf", 20)
-        textsurf1, textrect1 = self.text_objects("Player 2", largetext)
-        textsurf2, textrect2 = self.text_objects("Player 1", largetext)
+        textsurf1, textrect1 = self.text_objects(player2, largetext)
+        textsurf2, textrect2 = self.text_objects(player1, largetext)
         gamedisplays.blit(textsurf1, (20, 10))
         gamedisplays.blit(textsurf2, (700, 10))
 
     def message_display(self, text):
-        largetext3 = pygame.font.Font("freesansbold.ttf", 80)
+        largetext3 = pygame.font.Font("freesansbold.ttf", 64)
         textsurf3, textrect3 = self.text_objects(text, largetext3)
         textrect3.center = ((display_width / 2), (display_height / 2))
         gamedisplays.blit(textsurf3, textrect3)
@@ -111,13 +111,11 @@ class Game:
             b = self.queue.get()
             self.lines.append(b)
 
-    def crash(self):
-        self.message_display("GAME OVER")
+    def crash(self, winner):
+        self.message_display("WINNER IS: " + winner)
         return True
 
-    def game_loop(self):
-        player1 = Car(display_width * 0.65, display_height * 0.8, carimg_player1, carimg_player1_left, carimg_player1_right, carspeed_player1, carspeed_player1_left, carspeed_player1_right, "Player1")
-        player2 = Car(display_width * 0.30, display_height * 0.8, carimg_player2, carimg_player2_left, carimg_player2_right, carspeed_player2, carspeed_player2_left, carspeed_player2_right, "Player2")
+    def reset_game(self):
         self.oils[:] = []
         self.obstacles[:] = []
         self.level = 0
@@ -127,6 +125,11 @@ class Game:
         self.bonus_speed = 2.5
         self.oil_exist = False
         self.obs_exist = False
+
+    def game_loop(self, pl1, pl2):
+        player1 = pl1
+        player2 = pl2
+        self.reset_game()
         obs_width = 32
         pom = 7
         obs_startx = random.randrange(0, display_width - obs_width)
@@ -247,13 +250,21 @@ class Game:
 
             self.draw_display(player1, player2)
 
-            if player1.life <= 1.5 and player2.life <= 1.5:
-                bumped = self.crash()
+            if player1.life <= 1.5 or player2.life <= 1.5:
+                if player1.life <= 1.5:
+                    bumped = self.crash(player2.name)
+                else:
+                    bumped = self.crash(player1.name)
 
             self.t_create_obstacles(new_oil, self.oils, new_car, self.obstacles, self.passed, self.level,self.obstacle_speed, self.oil_speed, self.obs_exist, self.oil_exist)
 
             pygame.display.update()
             clock.tick(60)
+
+        if player1.life <= 1.5:
+            return player2.name
+        else:
+            return player1.name
 
     def t_start_game(self, player1, player2, oils, obstacles):
         t = threading.Thread(target=self.start_player, args=(player1, player2, oils, obstacles))
@@ -342,7 +353,7 @@ class Game:
                 new_car.obs_height = obs_car.obs_height
 
     def draw_display(self, player1, player2):
-        self.message_life_player()
+        self.message_life_player(player1.name, player2.name)
         self.life_player1(player1.life)
         self.life_player2(player2.life)
         self.score_level_system(self.passed, self.level)

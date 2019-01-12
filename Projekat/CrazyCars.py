@@ -3,6 +3,7 @@ import keyboard
 import pygame
 from Game import Game
 from Constants import *
+from Car import Car
 
 pygame.init()
 
@@ -30,6 +31,7 @@ class CrazyCars:
             if keyboard.is_pressed('SPACE'):
                 self.game.game_loop()
             self.button("START", 390, 234, 70, 40, red, yellow, "play")
+            self.button("TOURNAMENT", 330, 280, 190, 40, yellow, red, "tournament")
             self.button("QUIT", 430, 630, 200, 50, gray2, gray3, "quit")
             self.button("INSTRUCTION", 210, 630, 200, 50, gray2, gray3, "intro")
             pygame.display.update()
@@ -44,7 +46,46 @@ class CrazyCars:
 
             if click[0] == 1 and action != None:
                 if action == "play":
-                    self.game.game_loop()
+                    player1 = Car(display_width * 0.65, display_height * 0.8, carimg_player1, carimg_player1_left,
+                                  carimg_player1_right, carspeed_player1, carspeed_player1_left, carspeed_player1_right,
+                                  "Player 1")
+                    player2 = Car(display_width * 0.30, display_height * 0.8, carimg_player2, carimg_player2_left,
+                                  carimg_player2_right, carspeed_player2, carspeed_player2_left, carspeed_player2_right,
+                                  "Player 2")
+                    self.game.game_loop(player1, player2)
+                elif action == "tournament":
+                    final_player1 = None
+                    final_player2 = None
+                    player1 = Car(display_width * 0.65, display_height * 0.8, carimg_player1, carimg_player1_left,
+                                  carimg_player1_right, carspeed_player1, carspeed_player1_left, carspeed_player1_right,
+                                  "Ime 1")
+                    player2 = Car(display_width * 0.30, display_height * 0.8, carimg_player2, carimg_player2_left,
+                                  carimg_player2_right, carspeed_player2, carspeed_player2_left, carspeed_player2_right,
+                                  "Ime 2")
+                    winner1 = self.game.game_loop(player1, player2)
+                    player3 = Car(display_width * 0.65, display_height * 0.8, carimg_player1, carimg_player1_left,
+                                  carimg_player1_right, carspeed_player1, carspeed_player1_left, carspeed_player1_right,
+                                  "Ime 3")
+                    player4 = Car(display_width * 0.30, display_height * 0.8, carimg_player2, carimg_player2_left,
+                                  carimg_player2_right, carspeed_player2, carspeed_player2_left, carspeed_player2_right,
+                                  "Ime 4")
+                    winner2 = self.game.game_loop(player3, player4)
+
+                    if winner1 is player1.name:
+                        final_player1 = player1
+                    else:
+                        final_player1 = player2
+
+                    if winner2 is player3.name:
+                        final_player2 = player3
+                    else:
+                        final_player2 = player4
+
+                    final_player1.reset_values(display_width * 0.65, display_height * 0.8, carimg_player1, carimg_player1_left,
+                                  carimg_player1_right, carspeed_player1, carspeed_player1_left, carspeed_player1_right)
+                    final_player2.reset_values(display_width * 0.30, display_height * 0.8, carimg_player2, carimg_player2_left,
+                                  carimg_player2_right, carspeed_player2, carspeed_player2_left, carspeed_player2_right)
+                    self.game.game_loop(final_player1, final_player2)
                 elif action == "quit":
                     pygame.quit()
                     quit()

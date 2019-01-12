@@ -4,7 +4,7 @@ import random
 
 
 class Car:
-    def __init__(self, x, y, car_img, car_img_left, car_img_right, carspeed_player, carspeed_player_left,carspeed_player_right, name):
+    def __init__(self, x, y, car_img, car_img_left, car_img_right, carspeed_player, carspeed_player_left, carspeed_player_right, name):
         self.x = x
         self.y = y
         self.car_img = car_img
@@ -15,13 +15,29 @@ class Car:
         self.up = False
         self.down = False
         self.life = 3
-        self.images = [car_img, car_img_left, car_img_right, carspeed_player, carspeed_player_left,carspeed_player_right]
+        self.images = [car_img, car_img_left, car_img_right, carspeed_player, carspeed_player_left, carspeed_player_right]
         self.width = 32
         self.height = 64
         self.oil_hit = False
         self.name = name
         self.bonus = False
         self.speed_count = 0
+
+    def reset_values(self, x, y, car_img, car_img_left, car_img_right, carspeed_player, carspeed_player_left,carspeed_player_right):
+        self.x_change = 0
+        self.y_change = 0
+        self.left = False
+        self.right = False
+        self.up = False
+        self.down = False
+        self.life = 3
+        self.oil_hit = False
+        self.bonus = False
+        self.car_img = self.images[0]
+        self.x = x
+        self.y = y
+        self.car_img = car_img
+        self.images = [car_img, car_img_left, car_img_right, carspeed_player, carspeed_player_left, carspeed_player_right]
 
     def show_car(self, gamedisplays):
         gamedisplays.blit(self.car_img, (self.x, self.y))
