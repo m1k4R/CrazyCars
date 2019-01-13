@@ -4,12 +4,14 @@ import pygame
 from Game import Game
 from Constants import *
 from Car import Car
+from InputBox import InputBox
 
 pygame.init()
 
 class CrazyCars:
     def __init__(self, game):
         self.game = game
+        self.input_boxes = []
 
     def intro_loop(self):
         intro = True
@@ -54,21 +56,27 @@ class CrazyCars:
                                   "Player 2")
                     self.game.game_loop(player1, player2)
                 elif action == "tournament":
+                    self.get_names()
+                elif action == "play2":
                     final_player1 = None
                     final_player2 = None
+                    ime1 = self.input_boxes[0]
+                    ime2 = self.input_boxes[1]
+                    ime3 = self.input_boxes[2]
+                    ime4 = self.input_boxes[3]
                     player1 = Car(display_width * 0.65, display_height * 0.8, carimg_player1, carimg_player1_left,
                                   carimg_player1_right, carspeed_player1, carspeed_player1_left, carspeed_player1_right,
-                                  "Ime 1")
+                                  ime1.text)
                     player2 = Car(display_width * 0.30, display_height * 0.8, carimg_player2, carimg_player2_left,
                                   carimg_player2_right, carspeed_player2, carspeed_player2_left, carspeed_player2_right,
-                                  "Ime 2")
+                                  ime2.text)
                     winner1 = self.game.game_loop(player1, player2)
                     player3 = Car(display_width * 0.65, display_height * 0.8, carimg_player1, carimg_player1_left,
                                   carimg_player1_right, carspeed_player1, carspeed_player1_left, carspeed_player1_right,
-                                  "Ime 3")
+                                  ime3.text)
                     player4 = Car(display_width * 0.30, display_height * 0.8, carimg_player2, carimg_player2_left,
                                   carimg_player2_right, carspeed_player2, carspeed_player2_left, carspeed_player2_right,
-                                  "Ime 4")
+                                  ime4.text)
                     winner2 = self.game.game_loop(player3, player4)
 
                     if winner1 is player1.name:
@@ -86,6 +94,7 @@ class CrazyCars:
                     final_player2.reset_values(display_width * 0.30, display_height * 0.8, carimg_player2, carimg_player2_left,
                                   carimg_player2_right, carspeed_player2, carspeed_player2_left, carspeed_player2_right)
                     self.game.game_loop(final_player1, final_player2)
+                    self.intro_loop()
                 elif action == "quit":
                     pygame.quit()
                     quit()
@@ -101,6 +110,53 @@ class CrazyCars:
         textsurf, textrect = self.text_objects(msg, smalltext)
         textrect.center = ((x + (w / 2)), (y + (h / 2)))
         gamedisplays.blit(textsurf, textrect)
+
+    def get_names(self):
+        get_names = True
+        input_box1 = InputBox(100, 250, 140, 32)
+        input_box2 = InputBox(500, 250, 140, 32)
+        input_box3 = InputBox(100, 500, 140, 32)
+        input_box4 = InputBox(500, 500, 140, 32)
+
+
+        self.input_boxes = [input_box1, input_box2, input_box3, input_box4]
+
+        while get_names:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    quit()
+                    sys.exit()
+                for box in self.input_boxes:
+                    box.handle_event(event)
+            gamedisplays.fill(gray)
+
+            for box in self.input_boxes:
+                box.update()
+
+            gamedisplays.fill((30, 30, 30))
+            for box in self.input_boxes:
+                box.draw(gamedisplays)
+
+            #pygame.display.flip()
+            gamedisplays.blit(p1, (70, 50))
+            gamedisplays.blit(p3, (460, 50))
+            gamedisplays.blit(p2, (70, 300))
+            gamedisplays.blit(p4, (460, 300))
+
+            largetext = pygame.font.Font('freesansbold.ttf', 40)
+            TextSurf, TextRect = self.text_objects("VS", largetext)
+            TextRect.center = ((400), (200))
+            gamedisplays.blit(TextSurf, TextRect)
+
+            largetext = pygame.font.Font('freesansbold.ttf', 40)
+            TextSurf, TextRect = self.text_objects("VS", largetext)
+            TextRect.center = ((400), (450))
+            gamedisplays.blit(TextSurf, TextRect)
+
+            self.button("PLAY", 300, 630, 200, 50, gray2, gray3, "play2")
+            pygame.display.update()
+            clock.tick(30)
 
     def introduction(self):
         introduction = True
