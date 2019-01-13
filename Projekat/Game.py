@@ -219,6 +219,13 @@ class Game:
             player1.start_bonus()
             player2.start_bonus()
 
+            for obst_oil in self.oils:
+                player1.check_oil_colision(obst_oil)
+                player2.check_oil_colision(obst_oil)
+
+            player1.apply_oil()
+            player2.apply_oil()
+
             player1.x += player1.x_change
             player1.y += player1.y_change
             player2.x += player2.x_change
@@ -283,8 +290,6 @@ class Game:
             player.show_car(gamedisplays)
         player.check_border(display_width, display_height)
         player.check_another_player_colision(player2)
-        for obst_oil in oils:
-            player.check_oil_colision(obst_oil)
         for obst_car in obstacles:
             player.check_obstacle_colision(obst_car, gamedisplays, bom)
 

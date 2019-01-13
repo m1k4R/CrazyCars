@@ -19,6 +19,7 @@ class Car:
         self.width = 32
         self.height = 64
         self.oil_hit = False
+        self.oil_count = 0
         self.name = name
         self.bonus = False
         self.speed_count = 0
@@ -96,10 +97,12 @@ class Car:
                 self.y -= self.y_change
 
     def check_oil_colision(self, obst_oil):
-        if self.y > obst_oil.oil_starty and self.y < obst_oil.oil_starty + obst_oil.oil_height or self.y + self.height > obst_oil.oil_starty and self.y + self.height < obst_oil.oil_starty + obst_oil.oil_height:
-            if self.x > obst_oil.oil_startx and self.x < obst_oil.oil_startx + obst_oil.oil_width or self.x + self.width > obst_oil.oil_startx and self.x + self.width < obst_oil.oil_startx + obst_oil.oil_width:
-                self.x -= self.x_change
-                self.y -= self.y_change
+        if self.y > obst_oil.oil_starty + 5 and self.y < obst_oil.oil_starty + obst_oil.oil_height - 5 or self.y + self.height > obst_oil.oil_starty + 5 and self.y + self.height < obst_oil.oil_starty + obst_oil.oil_height - 5:
+            if self.x > obst_oil.oil_startx + 5 and self.x < obst_oil.oil_startx + obst_oil.oil_width - 5 or self.x + self.width > obst_oil.oil_startx + 5 and self.x + self.width < obst_oil.oil_startx + obst_oil.oil_width - 5:
+                self.oil_hit = True
+                # self.x -= self.x_change
+                # self.y -= self.y_change
+                # self.bonus = False
 
     def check_obstacle_colision(self, obst_car, gamedisplays, bom):
         if self.y > obst_car.obs_starty and self.y < obst_car.obs_starty + obst_car.obs_height or self.y + self.height > obst_car.obs_starty and self.y + self.height < obst_car.obs_starty + obst_car.obs_height:
@@ -110,3 +113,27 @@ class Car:
                 else:
                     self.life -= 0.1
                     gamedisplays.blit(bom, (self.x - 10, self.y - 10))
+
+    def apply_oil(self):
+        if self.oil_count == 20:
+            self.oil_hit = False
+            self.oil_count = 0
+            if self.left == True:
+                self.x_change = -5
+            if self.right == True:
+                self.x_change = 5
+            if self.up == True:
+                self.y_change = -5
+            if self.down == True:
+                self.y_change = 5
+
+        if self.oil_hit is True:
+            self.oil_count = self.oil_count + 1
+            if self.left == True:
+                self.x_change = 0
+            if self.right == True:
+                self.x_change = 0
+            if self.up == True:
+                self.y_change = 0
+            if self.down == True:
+                self.y_change = 0
