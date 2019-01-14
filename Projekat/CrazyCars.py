@@ -31,9 +31,15 @@ class CrazyCars:
             gamedisplays.blit(imag, (0, 100))
             gamedisplays.blit(TextSurf, TextRect)
             if keyboard.is_pressed('SPACE'):
-                self.game.game_loop()
+                player1 = Car(display_width * 0.65, display_height * 0.8, carimg_player1, carimg_player1_left,
+                              carimg_player1_right, carspeed_player1, carspeed_player1_left, carspeed_player1_right,
+                              "Player 1")
+                player2 = Car(display_width * 0.30, display_height * 0.8, carimg_player2, carimg_player2_left,
+                              carimg_player2_right, carspeed_player2, carspeed_player2_left, carspeed_player2_right,
+                              "Player 2")
+                self.game.game_loop(player1, player2)
             self.button("START", 390, 234, 70, 40, red, yellow, "play")
-            self.button("TOURNAMENT", 330, 280, 190, 40, yellow, red, "tournament")
+            self.button("TOURNAMENT", 330, 280, 190, 40, red, yellow, "tournament")
             self.button("QUIT", 430, 630, 200, 50, gray2, gray3, "quit")
             self.button("INSTRUCTION", 210, 630, 200, 50, gray2, gray3, "intro")
             pygame.display.update()
@@ -117,7 +123,6 @@ class CrazyCars:
         input_box2 = InputBox(500, 250, 140, 32)
         input_box3 = InputBox(100, 500, 140, 32)
         input_box4 = InputBox(500, 500, 140, 32)
-
 
         self.input_boxes = [input_box1, input_box2, input_box3, input_box4]
 

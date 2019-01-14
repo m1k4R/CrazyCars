@@ -245,7 +245,7 @@ class Game:
             # pomjeranje bonusa
             if bonus.bonus_starty > display_height:
                 bonus.bonus_startx = random.randrange(31, display_width - 31)
-                bonus.bonus_starty = 0 - 30
+                bonus.bonus_starty = 0 - 350
             bonus.move_bonus(self.bonus_speed, gamedisplays)
 
             # Pomjeranje autica
